@@ -4,19 +4,17 @@ interface Task {
     id: number;
     name: string;
     status: boolean;
-    editable?: boolean;
 };
 interface Props {
-    tasks: Task[]; 
-    updateTasks: CallableFunction;
+    tasks: Task[];
     editingId: number | null;
     onEdit: (task:Task) =>void;
     onSave: (task: Task) => void;
-};
+    setEditingId: CallableFunction;
+    onDelete: (task: Task) => void;
+}
 
-const Table = ({ tasks, updateTasks, editingId, onEdit, onSave}: Props) => {
-
-  
+const Table = ({ tasks, editingId, onEdit, onSave , setEditingId , onDelete}: Props) => {
 
  return (
   <div className="py-5">
@@ -34,11 +32,12 @@ const Table = ({ tasks, updateTasks, editingId, onEdit, onSave}: Props) => {
           tasks.map((task) =>(
             <TaskRow 
             key={task.id} 
-            task={task} 
+            task={task}
             isEditing={editingId === task.id}
-            updateTasks={updateTasks}
             onEdit={onEdit}
             onSave={onSave}
+            setEditingId={setEditingId}
+            onDelete={onDelete}
             />)
         )) : (
           <tr>

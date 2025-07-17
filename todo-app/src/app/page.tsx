@@ -9,14 +9,11 @@ interface Task {
     id: number;
     name: string;
     status: boolean;
-    editable?: boolean;
-};
+}
 
 export default function Home() {
-  const [tasks, setTasks] = useState([]);
+  const [tasks, setTasks] = useState<Task[]>([]);
   const [editingId, setEditingId] = useState<number | null>(null);
-  const [updateTask, setUpdateTask] = useState({id:"", name:"", status:""});
-
 
   useEffect(() => {
     getAllTask().then((data) => {
@@ -24,38 +21,47 @@ export default function Home() {
     });
   }, []);
 
-  const updateTasks = (updatedTasks)=> {
-    setTasks(updatedTasks)
-  }
 
-  const handleEdit = (task: Task) => 
-    setEditingId(task.id)
-    console.log(editingId);
+  const handleEdit = (task: Task) => setEditingId(task.id)
 
-  // const handleSave = (updated: Task) => {
-  //   setUpdateTask(updated)
-  //   setTasks((prev) =>
-  //     prev.map((t) => (t.id === updated.id ? updated : t))
-  //   );
-  //   console.log("sss",updateTask)
-  //   setEditingId(null);
-  // };
+  const handlerAdd = (addNewRow: any) => {
+    console.log("handleUpdated",addNewRow)
+    setTasks(addNewRow)
+  } 
 
-  
   const handleSave = async (updated: Task) => {
-      setTasks((prev) =>
-      prev.map((t) => (t.id === updated.id ? updated : t))
-    );
-      const payload = {
+    if (updated){
+        const payload = {
         name: updated.name,
         status: updated.status
-      };
-      const response = await api.put(`task/${updated.id}`, payload);
-      console.log(response);
+      }
+      if (editingId === 0) {
+        const response = await api.post('task', payload);
+        console.log("post response",response);
+        setTasks((prev) => {
+            prev = [...prev];
+            prev.shift();
+            return [...prev, response.data];
+            });
+
+      } else {
+        const response = await api.put(`task/${updated.id}`, payload);
+        console.log("update response",response);
+        setTasks((prev) => 
+        prev.map((t) => (t.id === updated.id ? updated : t))
+      );
+      }
       setEditingId(null);
     }
+  }
 
-    
+  const handleDelete = async ( task: Task ) =>{
+        console.log("Deleting task", task.id)
+        const response = await api.delete(`/task/${task.id}`);
+        const filteredTasks = tasks.filter(el => el.id != task.id);
+        setTasks(filteredTasks)
+    }
+
   return (
     <div className="pl-10 pr-10">
       <div className="justify-center items-center flex text-5xl py-10 font-bold">
@@ -64,17 +70,17 @@ export default function Home() {
       <div>
         <SearchBar
           tasks={tasks} 
-          updateTasks={updateTasks}
           onEdit={handleEdit}
+          handlerAdd={handlerAdd}
         />
         <main>
         <Table
-          tasks={tasks}
-          updateTasks={updateTasks}
-          editingId={editingId}
-          onEdit={handleEdit}
-          onSave={handleSave}
-          setEditingId={setEditingId}
+            tasks={tasks}
+            editingId={editingId}
+            onEdit={handleEdit}
+            onSave={handleSave}
+            setEditingId={setEditingId}
+            onDelete={handleDelete}
         />
         </main>
       </div>

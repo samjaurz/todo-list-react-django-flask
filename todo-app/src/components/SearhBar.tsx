@@ -7,27 +7,26 @@ interface Task {
     id: number;
     name: string;
     status: boolean;
-    editable?: boolean
-};
+}
 
 interface Props {
     tasks: Task[];
-    updateTasks: CallableFunction;
-    onEdit: (task:Task) =>void;
-};
+    handlerAdd: CallableFunction;
+    onEdit: CallableFunction;
+}
 
-const SearchBar = ({ tasks, updateTasks }: Props) => {
+const SearchBar = ({ tasks, handlerAdd, onEdit}: Props) => {
   const addTask = () => {
     console.log("add row")
     const new_tasks = [{
       id: 0,
       status: false,
-      name: "",
-      editable: true
+      name: ""
     }, ...tasks];
 
-
-    updateTasks(new_tasks)
+    console.log("new_task added", new_tasks)
+    handlerAdd(new_tasks)
+    onEdit(new_tasks[0])
   }
 
    
