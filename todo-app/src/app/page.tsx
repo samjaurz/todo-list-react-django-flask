@@ -1,35 +1,61 @@
 "use client";
-import BarTask from "@/components/bar_task";
-import SearchBar from "@/components/search_bar";
+import api from "@/lib/axios"
+import SearchBar from "@/components/SearhBar";
+import Table from "@/components/Table"
 import { useEffect, useState } from "react";
 import { getAllTask } from "@/services/taskService";
 
+interface Task {
+    id: number;
+    name: string;
+    status: boolean;
+    editable?: boolean;
+};
+
 export default function Home() {
-  const [tasks, setTasks] = useState(null);
-  const [selectedTask, setSelectedTask] = useState("");
+  const [tasks, setTasks] = useState([]);
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const [updateTask, setUpdateTask] = useState({id:"", name:"", status:""});
 
 
   useEffect(() => {
     getAllTask().then((data) => {
-      console.log("data", data)
-      if (data == undefined)
-        data = []
-      setTasks(data);
-      console.log("renderizado de tabla setTask" , setTasks(data))
+      setTasks(data ?? []);
     });
   }, []);
-  if (!tasks) return null;
 
   const updateTasks = (updatedTasks)=> {
     setTasks(updatedTasks)
   }
 
-  const onSelectTask = (task) =>{
-    task.editable = true
-    console.log("selected task hook", task)
-    setSelectedTask(task)
-  }
+  const handleEdit = (task: Task) => 
+    setEditingId(task.id)
+    console.log(editingId);
 
+  // const handleSave = (updated: Task) => {
+  //   setUpdateTask(updated)
+  //   setTasks((prev) =>
+  //     prev.map((t) => (t.id === updated.id ? updated : t))
+  //   );
+  //   console.log("sss",updateTask)
+  //   setEditingId(null);
+  // };
+
+  
+  const handleSave = async (updated: Task) => {
+      setTasks((prev) =>
+      prev.map((t) => (t.id === updated.id ? updated : t))
+    );
+      const payload = {
+        name: updated.name,
+        status: updated.status
+      };
+      const response = await api.put(`task/${updated.id}`, payload);
+      console.log(response);
+      setEditingId(null);
+    }
+
+    
   return (
     <div className="pl-10 pr-10">
       <div className="justify-center items-center flex text-5xl py-10 font-bold">
@@ -39,12 +65,18 @@ export default function Home() {
         <SearchBar
           tasks={tasks} 
           updateTasks={updateTasks}
-          onSelectTask={onSelectTask}
+          onEdit={handleEdit}
         />
-        <BarTask
-          tasks={tasks} 
+        <main>
+        <Table
+          tasks={tasks}
           updateTasks={updateTasks}
+          editingId={editingId}
+          onEdit={handleEdit}
+          onSave={handleSave}
+          setEditingId={setEditingId}
         />
+        </main>
       </div>
     </div>
   );
