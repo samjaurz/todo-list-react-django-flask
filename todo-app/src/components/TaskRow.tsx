@@ -14,10 +14,10 @@ interface Props {
     onSave: (task: Task) => void
     setEditingId: CallableFunction
     onDelete: (task: Task) => void
-    handlerAdd: CallableFunction;
+    handleCancel: CallableFunction;
 }
 
-const TaskRow = ({task, isEditing, onEdit, onSave, setEditingId, onDelete, handlerAdd}: Props) => {
+const TaskRow = ({task, isEditing, onEdit, onSave, onDelete, handleCancel}: Props) => {
 
     const [value, setValue] = useState(task.name);
     const [statusCompleted, setStatusCompleted] = useState("")
@@ -53,7 +53,7 @@ const TaskRow = ({task, isEditing, onEdit, onSave, setEditingId, onDelete, handl
                                        onClick={() => onSave({...task, name: value, status: boolString})}/>
                         </button>
                         <button className="bg-red-500 hover:bg-red-600 text-white rounded p-2">
-                            <XMarkIcon className="h-4 w-4" onClick={() => setEditingId(task)}/>
+                            <XMarkIcon className="h-4 w-4" onClick={()=>handleCancel(task)}/>
                         </button>
                     </div>
                 </td>
@@ -62,7 +62,7 @@ const TaskRow = ({task, isEditing, onEdit, onSave, setEditingId, onDelete, handl
     return (
 
         <tr key={task.id}
-            className="hover:bg-gray-50">
+            className={`hover:bg-gray-50 text-center p-3 ${task.status ? "bg-amber-50" : "bg-white"}`}>
             <td className="text-center p-3">{task.id}</td>
             <td className="p-3">{task.name}</td>
             <td className="text-center p-3">{task.status ? "Completed" : "Incomplete"}</td>

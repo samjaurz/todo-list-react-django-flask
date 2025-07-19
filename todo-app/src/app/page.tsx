@@ -22,10 +22,43 @@ export default function Home() {
     }, []);
 
 
-    const handleEdit = (task: Task) => setEditingId(task.id)
+    const handleEdit = (task: Task) => {
 
-    const handlerAdd = (addNewRow: any) => {
-        setTasks(addNewRow)
+        console.log("task edit", task.id)
+        const alreadyExist = tasks.some(task => task.id === 0);
+        if (alreadyExist) {
+            if (task.id !== 0) {
+                tasks.shift()
+                setEditingId(null)
+            }
+        }
+        setEditingId(task.id)
+    }
+
+    const handleCancel = (task: Task) => {
+        if (task.id === 0) {
+            const newTasks = tasks.filter(t => t.id !== 0);
+            setTasks(newTasks);
+        }
+            setEditingId(null)
+
+    }
+    const handlerAdd = () => {
+
+        const addId_0 = tasks.some(task => task.id === 0);
+        if (addId_0) {
+            return
+        }
+
+        const new_tasks = [{
+            id: 0,
+            status: false,
+            name: ""
+        }, ...tasks];
+
+        console.log("new_task added", new_tasks)
+        setTasks(new_tasks)
+        handleEdit(new_tasks[0])
     }
     const handleSearch = async (searchTask: string) => {
         console.log("search handle", searchTask)
@@ -33,13 +66,6 @@ export default function Home() {
         console.log("response handle search after api", response)
         setTasks(response.data)
     }
-
-    //     const filtered = tasks.filter((task) => {
-    //         return task.name.toLowerCase().includes(addNewRow.toLowerCase());
-    //     })
-    //     setTasks(filtered)
-    // }
-
     const handleSave = async (updated: Task) => {
         console.log("updated", typeof (updated.status))
         if (updated) {
@@ -69,7 +95,7 @@ export default function Home() {
     const handleDelete = async (task: Task) => {
         console.log("Deleting task", task.id)
         const response = await api.delete(`/task/${task.id}`);
-        console.log("delete",response)
+        console.log("delete", response)
         const filteredTasks = tasks.filter(el => el.id != task.id);
         setTasks(filteredTasks)
     }
@@ -82,9 +108,8 @@ export default function Home() {
             <div>
                 <SearchBar
                     tasks={tasks}
-                    onEdit={handleEdit}
                     handleSearch={handleSearch}
-                    handlerAdd = {handlerAdd}
+                    handlerAdd={handlerAdd}
                 />
                 <main>
                     <Table
@@ -94,7 +119,7 @@ export default function Home() {
                         onSave={handleSave}
                         setEditingId={setEditingId}
                         onDelete={handleDelete}
-                        handlerAdd={handlerAdd}
+                        handleCancel={handleCancel}
                     />
                 </main>
             </div>

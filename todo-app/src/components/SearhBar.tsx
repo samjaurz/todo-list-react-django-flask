@@ -11,32 +11,20 @@ interface Task {
 
 interface Props {
     tasks: Task[];
-    handlerAdd: CallableFunction;
-    handleSearch: CallableFunction;
-    onEdit: CallableFunction;
+    handlerAdd: () => void;
+    handleSearch: (value: string) => void;
 }
 
-const SearchBar = ({tasks, handlerAdd,handleSearch, onEdit}: Props) => {
+const SearchBar = ({tasks, handlerAdd,handleSearch}: Props) => {
     const [searchTask, setSearchTask] = useState<string>("")
 
-    const addTask = () => {
-        console.log("add row")
-        const new_tasks = [{
-            id: 0,
-            status: false,
-            name: ""
-        }, ...tasks];
-
-        console.log("new_task added", new_tasks)
-        handlerAdd(new_tasks)
-        onEdit(new_tasks[0])
-    }
 
 
-    const onChange = (e) => {
-        setSearchTask(e.target.value);
-        console.log("task", tasks)
-        handleSearch(searchTask)
+    const onChange = (e:React.ChangeEvent<HTMLInputElement>) => {
+        const value=e.target.value
+        setSearchTask(value);
+        handleSearch(value)
+        console.log("filter task", tasks)
     }
 
     return (
@@ -51,7 +39,7 @@ const SearchBar = ({tasks, handlerAdd,handleSearch, onEdit}: Props) => {
 
             <div className="flex space-x-2 items-start ">
                 <button className="bg-green-500 hover:bg-green-600 text-white p-2 rounded">
-                    <PlusIcon className="h-4 w-4" onClick={addTask}/>
+                    <PlusIcon className="h-4 w-4" onClick={handlerAdd}/>
                 </button>
             </div>
         </div>

@@ -13,10 +13,10 @@ interface Props {
     onSave: (task: Task) => void;
     setEditingId: CallableFunction;
     onDelete: (task: Task) => void;
-    handlerAdd: CallableFunction;
+    handleCancel: CallableFunction;
 }
 
-const Table = ({tasks, editingId, onEdit, onSave, setEditingId, onDelete, handlerAdd}: Props) => {
+const Table = ({tasks, editingId, onEdit, onSave, setEditingId, onDelete, handleCancel}: Props) => {
 
     return (
         <div className="py-5">
@@ -40,7 +40,7 @@ const Table = ({tasks, editingId, onEdit, onSave, setEditingId, onDelete, handle
                             onSave={onSave}
                             setEditingId={setEditingId}
                             onDelete={onDelete}
-                            handlerAdd={handlerAdd}
+                            handleCancel={handleCancel}
                         />)
                     )) : (
                     <tr>
