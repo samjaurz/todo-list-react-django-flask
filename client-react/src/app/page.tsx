@@ -4,6 +4,7 @@ import SearchBar from "@/components/SearhBar";
 import Table from "@/components/Table";
 import {useEffect, useState} from "react";
 import getApiInstance from "@/lib/axios";
+import Dropdown from "@/components/Dropdown";
 
 interface Task {
     id: number;
@@ -11,16 +12,24 @@ interface Task {
     status: boolean;
 }
 
+interface User {
+    id: number,
+    name: string,
+    last_name: string,
+    status: boolean
+}
+
 export default function Home() {
     const [tasks, setTasks] = useState<Task[]>([]);
     const [editingId, setEditingId] = useState<number | null>(null);
     const [apiSelection, setApiSelection] = useState(false)
+    const [users, setUsers] = useState<User[]>([]);
 
     const api = getApiInstance(apiSelection);
 
     const getAllTask = async () => {
         try {
-            const response = await api.get("/task/");
+            const response = await api.get("/tasks/");
             console.log("Get all entries", response.data);
             return response.data;
         } catch (error) {
@@ -28,13 +37,30 @@ export default function Home() {
         }
     };
 
+    const getAllUser = async () => {
+        try {
+            const response = await api.get("/users/");
+            console.log("Get all users", response.data);
+            return response.data;
+        } catch (error) {
+            console.error("Error Axios", error);
+        }
+    };
+
+
     useEffect(() => {
         getAllTask().then((data) => {
             setTasks(data ?? []);
         });
     }, [apiSelection]);
 
+    useEffect(() => {
+        getAllUser().then((data) => {
+            setUsers(data ?? []);
+        });
+    }, []);
 
+    console.log("users", users)
     const handleEdit = (task: Task) => {
         console.log("task edit", task.id)
         const alreadyExist = tasks.some(task => task.id === 0);
@@ -73,7 +99,7 @@ export default function Home() {
     }
     const handleSearch = async (searchTask: string) => {
         console.log("search handle", searchTask)
-        const response = await api.get(`task/search?name=${searchTask}`)
+        const response = await api.get(`tasks/search?name=${searchTask}`)
         console.log("response handle search after api", response)
         setTasks(response.data)
     }
@@ -85,7 +111,7 @@ export default function Home() {
                 status: updated.status
             }
             if (editingId === 0) {
-                const response = await api.post('task/', payload);
+                const response = await api.post('tasks/', payload);
                 console.log("post response", response);
                 setTasks((prev) => {
                     prev = [...prev];
@@ -94,7 +120,7 @@ export default function Home() {
                     return [...prev, response.data];
                 });
             } else {
-                const response = await api.put(`task/${updated.id}`, payload);
+                const response = await api.put(`tasks/${updated.id}`, payload);
                 console.log("update response", response);
                 setTasks((prev) =>
                     prev.map((t) => (t.id === updated.id ? updated : t))
@@ -105,10 +131,16 @@ export default function Home() {
     }
     const handleDelete = async (task: Task) => {
         console.log("Deleting task", task.id)
-        const response = await api.delete(`/task/${task.id}`);
+        const response = await api.delete(`/tasks/${task.id}`);
         console.log("delete", response)
         const filteredTasks = tasks.filter(el => el.id != task.id);
         setTasks(filteredTasks)
+    }
+
+    const handleFilterUser = async  (user:User) =>{
+        console.log(user,"www")
+        const response = await api.get(`users/${user}/tasks`)
+        setTasks(response.data);
     }
 
     return (
@@ -116,28 +148,33 @@ export default function Home() {
             <div className="justify-center items-center flex text-5xl py-10 font-bold">
                 <h1>TODO LIST</h1>
             </div>
-            <div>
-                <SearchBar
-                    tasks={tasks}
-                    handleSearch={handleSearch}
-                    handlerAdd={handlerAdd}
-                    setApiSelection={setApiSelection}
-                />
-                <div className={`text-center items-end ${apiSelection? "bg-green-400" : "bg-amber-200"}`}>
-                    <h1>{apiSelection ? "Django API" : "Flask API"}</h1>
-                </div>
-                <main>
-                    <Table
-                        tasks={tasks}
-                        editingId={editingId}
-                        onEdit={handleEdit}
-                        onSave={handleSave}
-                        setEditingId={setEditingId}
-                        onDelete={handleDelete}
-                        handleCancel={handleCancel}
-                    />
-                </main>
+            <div className="justify-end flex p-3">
+                 <Dropdown
+                     users={users}
+                    handleFilterUser = {handleFilterUser}
+                 />
             </div>
+
+            <SearchBar
+                tasks={tasks}
+                handleSearch={handleSearch}
+                handlerAdd={handlerAdd}
+                setApiSelection={setApiSelection}
+            />
+            <div className={`text-center items-end ${apiSelection ? "bg-green-400" : "bg-amber-200"}`}>
+                <h1>{apiSelection ? "Django API" : "Flask API"}</h1>
+            </div>
+            <main>
+                <Table
+                    tasks={tasks}
+                    editingId={editingId}
+                    onEdit={handleEdit}
+                    onSave={handleSave}
+                    setEditingId={setEditingId}
+                    onDelete={handleDelete}
+                    handleCancel={handleCancel}
+                />
+            </main>
         </div>
     );
 }

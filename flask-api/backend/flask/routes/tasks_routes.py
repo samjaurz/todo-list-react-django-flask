@@ -1,14 +1,12 @@
 from flask import Blueprint, jsonify, request
 from backend.model.task import Task
 from backend.db_session import SessionLocal
-from flask_cors import CORS
-api = Blueprint('api', __name__)
-CORS(api)
+
+tasks_api = Blueprint('tasks_api', __name__)
 session = SessionLocal()
 
-@api.route('/task/', methods=['POST'])
+@tasks_api.route('/tasks/', methods=['POST'])
 def create_task():
-
     data = request.get_json()
     task = Task(
         name=data["name"],
@@ -19,19 +17,21 @@ def create_task():
 
     return jsonify(task.to_dict())
 
-@api.route('/task/<int:id>', methods=['GET'])
+
+@tasks_api.route('/tasks/<int:id>', methods=['GET'])
 def get_task_by_id(id):
     task = session.query(Task).filter_by(id=id).first()
     if task is None:
         return jsonify({"message": "task not found"})
     return jsonify(task.to_dict())
 
-@api.route('/task/', methods=['GET'])
+
+@tasks_api.route('/tasks/', methods=['GET'])
 def get_task_all():
     tasks = session.query(Task).order_by(Task.id).all()
     if not tasks:
-        return jsonify({"message": "task not found"}) , 404
-    #todo list comprension
+        return jsonify({"message": "task not found"}), 404
+    # todo list comprension
     task_list = []
     for task in tasks:
         task_list.append({
@@ -41,14 +41,16 @@ def get_task_all():
         })
     return jsonify(task_list)
 
-@api.route('/task/<int:id>', methods=['PUT'])
+
+@tasks_api.route('/tasks/<int:id>', methods=['PUT'])
 def update_task_by_id(id):
     task = session.query(Task).filter_by(id=id).first()
     if task is None:
         return jsonify({"message": "task not found"}), 404
     required_fields = [
         "name",
-        "status"
+        "status",
+        "user_id",
     ]
     data = request.get_json()
     updated = False
@@ -60,16 +62,18 @@ def update_task_by_id(id):
     if updated:
         session.commit()
     return jsonify({"message": "task updated",
-                    "task_updated":task.to_dict()}), 200
+                    "task_updated": task.to_dict()}), 200
 
-@api.route('/task/<int:id>', methods=['DELETE'])
+
+@tasks_api.route('/tasks/<int:id>', methods=['DELETE'])
 def delete_task(id):
     task = session.query(Task).filter_by(id=id).first()
     session.delete(task)
     session.commit()
     return jsonify({"message": "Success"})
 
-@api.route('/task/search/', methods=['GET'])
+
+@tasks_api.route('/tasks/search/', methods=['GET'])
 def get_task_by_name():
     name = request.args.get('name')
     if not name:
@@ -84,4 +88,3 @@ def get_task_by_name():
     } for task in tasks]
 
     return jsonify(task_list)
-

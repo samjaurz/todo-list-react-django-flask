@@ -1,5 +1,5 @@
-from sqlalchemy.orm import Mapped , mapped_column
-from sqlalchemy import  String, Boolean
+from sqlalchemy.orm import Mapped , mapped_column, relationship
+from sqlalchemy import  String, Boolean, ForeignKey
 
 from . import Base
 
@@ -9,13 +9,16 @@ class Task(Base):
     name : Mapped[str] = mapped_column(String)
     status : Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
 
+    user_id : Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=True)
+    user: Mapped["User"] = relationship(back_populates="task")
+
     def __repr__(self) -> str:
         return f"<Task id={self.id} name={self.name}>"
-
 
     def to_dict(self) -> dict:
         return {
             "id": self.id,
             "name": self.name,
             "status": self.status.__str__(),
+            "user_id": self.user_id,
         }
