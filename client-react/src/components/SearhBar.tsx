@@ -7,6 +7,7 @@ interface Task {
     id: number;
     name: string;
     status: boolean;
+    user_id: number
 }
 interface Props {
     tasks: Task[];

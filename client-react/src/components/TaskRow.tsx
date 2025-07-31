@@ -5,6 +5,7 @@ interface Task {
     id: number;
     name: string;
     status: boolean;
+    user_id: number;
 }
 
 interface Props {
@@ -60,7 +61,6 @@ const TaskRow = ({task, isEditing, onEdit, onSave ,handleCancel, onDelete }: Pro
             </tr>
         )
     return (
-
         <tr key={task.id}
             className={`hover:bg-gray-50 text-center p-3 ${task.status ? "bg-amber-50" : "bg-white"}`}>
             <td className="text-center p-3">{task.id}</td>

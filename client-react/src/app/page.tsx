@@ -10,6 +10,7 @@ interface Task {
     id: number;
     name: string;
     status: boolean;
+    user_id: number;
 }
 
 interface User {
@@ -23,19 +24,10 @@ export default function Home() {
     const [tasks, setTasks] = useState<Task[]>([]);
     const [editingId, setEditingId] = useState<number | null>(null);
     const [apiSelection, setApiSelection] = useState(false)
+    const [userId, setUserId] = useState<number>(0);
     const [users, setUsers] = useState<User[]>([]);
 
     const api = getApiInstance(apiSelection);
-
-    const getAllTask = async () => {
-        try {
-            const response = await api.get("/tasks/");
-            console.log("Get all entries", response.data);
-            return response.data;
-        } catch (error) {
-            console.error("Error Axios", error);
-        }
-    };
 
     const getAllUser = async () => {
         try {
@@ -47,20 +39,12 @@ export default function Home() {
         }
     };
 
-
-    useEffect(() => {
-        getAllTask().then((data) => {
-            setTasks(data ?? []);
-        });
-    }, [apiSelection]);
-
     useEffect(() => {
         getAllUser().then((data) => {
             setUsers(data ?? []);
         });
     }, []);
 
-    console.log("users", users)
     const handleEdit = (task: Task) => {
         console.log("task edit", task.id)
         const alreadyExist = tasks.some(task => task.id === 0);
@@ -81,16 +65,16 @@ export default function Home() {
 
     }
     const handlerAdd = () => {
-
         const addId_0 = tasks.some(task => task.id === 0);
         if (addId_0) {
             return
         }
-
+        console.log(tasks,"task add handler")
         const new_tasks = [{
             id: 0,
             status: false,
-            name: ""
+            name: "",
+            user_id: userId
         }, ...tasks];
 
         console.log("new_task added", new_tasks)
@@ -104,11 +88,12 @@ export default function Home() {
         setTasks(response.data)
     }
     const handleSave = async (updated: Task) => {
-        console.log("updated", typeof (updated.status))
+        console.log("updated", updated)
         if (updated) {
             const payload = {
                 name: updated.name,
-                status: updated.status
+                status: updated.status,
+                user_id: updated.user_id
             }
             if (editingId === 0) {
                 const response = await api.post('tasks/', payload);
@@ -136,10 +121,11 @@ export default function Home() {
         const filteredTasks = tasks.filter(el => el.id != task.id);
         setTasks(filteredTasks)
     }
-
-    const handleFilterUser = async  (user:User) =>{
-        console.log(user,"www")
+    const handleFilterUser = async  (user:number) =>{
+        console.log(user,"userFilter")
+        setUserId(user)
         const response = await api.get(`users/${user}/tasks`)
+        console.log("user_selected", response.data)
         setTasks(response.data);
     }
 
@@ -151,7 +137,7 @@ export default function Home() {
             <div className="justify-end flex p-3">
                  <Dropdown
                      users={users}
-                    handleFilterUser = {handleFilterUser}
+                     handleFilterUser = {handleFilterUser}
                  />
             </div>
 

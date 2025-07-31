@@ -9,24 +9,22 @@ interface User {
 
 interface Props {
     users: User[];
-    handleFilterUser: (user: User) => void;
+    handleFilterUser: (userId: number) => void;
 }
 
 const Dropdown = ({users, handleFilterUser}: Props) => {
-    console.log(users)
     const [selectedValue, setSelectedValue] = useState('');
 
-    const handleChange = (event) => {
+    const handleChange =  (event: React.ChangeEvent<HTMLSelectElement>) => {
         const value=event.target.value
         setSelectedValue(value);
-        handleFilterUser(value)
-        console.log(value,"prin valut")
+        handleFilterUser(parseInt(value))
   };
     return (
 
         <div>
             <select value={selectedValue} onChange={handleChange}>
-                <option value="all">Select a user</option>
+                <option value="">Select a user</option>
                 {users.map((users) => (
                     <option key={users.id} value={users.id}>
                         {users.name}
@@ -39,17 +37,3 @@ const Dropdown = ({users, handleFilterUser}: Props) => {
 
 export default Dropdown;
 
-
-//
-// <div>
-//     <select value={selectedValue} onChange={handleChange}>
-//         <option value="">Select a fruit</option>
-//         {/* Default/placeholder option */}
-//         {options.map((option) => (
-//             <option key={option.value} value={option.value}>
-//                 {option.label}
-//             </option>
-//         ))}
-//     </select>
-//     <p>Selected: {selectedValue}</p>
-// </div>
