@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify, request
 from backend.model.task import Task
 from backend.db_session import SessionLocal
+from sqlalchemy.orm import selectinload
 
 tasks_api = Blueprint('tasks_api', __name__)
 session = SessionLocal()
@@ -10,7 +11,8 @@ def create_task():
     data = request.get_json()
     task = Task(
         name=data["name"],
-        status=data["status"]
+        status=data["status"],
+        user_id=data["user_id"],
     )
     session.add(task)
     session.commit()
@@ -61,8 +63,7 @@ def update_task_by_id(id):
             updated = True
     if updated:
         session.commit()
-    return jsonify({"message": "task updated",
-                    "task_updated": task.to_dict()}), 200
+    return jsonify({"task_updated": task.to_dict()}), 200
 
 
 @tasks_api.route('/tasks/<int:id>', methods=['DELETE'])

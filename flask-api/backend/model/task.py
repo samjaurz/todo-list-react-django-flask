@@ -19,6 +19,8 @@ class Task(Base):
         return {
             "id": self.id,
             "name": self.name,
-            "status": self.status.__str__(),
+            "status": self.status,
             "user_id": self.user_id,
         }
+
+

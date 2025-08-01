@@ -20,5 +20,5 @@ class User(Base):
             "id": self.id,
             "name": self.name,
             "last_name": self.last_name,
-            "status": self.status.__str__(),
+            "status": self.status.__str__()
         }

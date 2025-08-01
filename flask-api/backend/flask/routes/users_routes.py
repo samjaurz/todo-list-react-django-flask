@@ -1,7 +1,6 @@
 from flask import Blueprint, jsonify, request
 from backend.db_session import SessionLocal
 from backend.model.users import User
-from backend.model.task import Task
 users_api = Blueprint('users_api', __name__)
 session = SessionLocal()
 
@@ -88,16 +87,9 @@ def get_user_by_name():
     return jsonify(users_list)
 
 @users_api.route('/users/<int:id>/tasks', methods=['GET'])
-def get_all_task_by_user_id(id):
+def get_task_by_user_id(id):
     user = session.query(User).filter_by(id=id).first()
     if user is None:
         return jsonify({"message": "user not found"}), 404
-    tasks = session.query(Task).filter_by(user_id=user.id).all()
-    task_list = []
-    for task in tasks:
-        task_list.append({
-            "id": task.id,
-            "name": task.name,
-            "status": task.status
-        })
-    return jsonify(task_list)
+    tasks = user.task
+    return jsonify([task.to_dict() for task in tasks])
