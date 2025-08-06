@@ -1,91 +1,62 @@
 from flask import Blueprint, jsonify, request
-from backend.model.task import Task
 from backend.db_session import SessionLocal
-from sqlalchemy.orm import selectinload
+from backend.repositories.task_repository import TaskRepository
 
 tasks_api = Blueprint('tasks_api', __name__)
 session = SessionLocal()
 
-@tasks_api.route('/tasks/', methods=['POST'])
+
+@tasks_api.route('/', methods=['POST'])
 def create_task():
     data = request.get_json()
-    task = Task(
+    created_task = TaskRepository(session).create_task(
         name=data["name"],
         status=data["status"],
-        user_id=data["user_id"],
+        user_id=data["user_id"]
     )
-    session.add(task)
-    session.commit()
-
-    return jsonify(task.to_dict())
+    return jsonify(created_task.to_dict()), 200
 
 
-@tasks_api.route('/tasks/<int:id>', methods=['GET'])
-def get_task_by_id(id):
-    task = session.query(Task).filter_by(id=id).first()
-    if task is None:
+@tasks_api.route('/<int:id_task>', methods=['GET'])
+def get_task_by_id(id_task: int):
+    read_task = TaskRepository(session).get_task_by_id(id_task)
+    if read_task is None:
         return jsonify({"message": "task not found"})
-    return jsonify(task.to_dict())
+    return jsonify(read_task.to_dict()), 200
 
 
-@tasks_api.route('/tasks/', methods=['GET'])
+@tasks_api.route('/', methods=['GET'])
 def get_task_all():
-    tasks = session.query(Task).order_by(Task.id).all()
+    tasks = TaskRepository(session).get_all_tasks()
     if not tasks:
         return jsonify({"message": "task not found"}), 404
-    # todo list comprension
-    task_list = []
-    for task in tasks:
-        task_list.append({
-            "id": task.id,
-            "name": task.name,
-            "status": task.status
-        })
-    return jsonify(task_list)
+    return jsonify([task.to_dict() for task in tasks])
 
 
-@tasks_api.route('/tasks/<int:id>', methods=['PUT'])
-def update_task_by_id(id):
-    task = session.query(Task).filter_by(id=id).first()
-    if task is None:
-        return jsonify({"message": "task not found"}), 404
-    required_fields = [
-        "name",
-        "status",
-        "user_id",
-    ]
+@tasks_api.route('/<int:id_task>', methods=['PUT'])
+def update_task_by_id(id_task):
     data = request.get_json()
-    updated = False
+    updated_task = TaskRepository(session).update_task(
+        task_id=id_task,
+        **{
+            "name": data["name"],
+            "status": data["status"],
+            "user_id": data["user_id"]
+        }
+    )
+    return jsonify({"task_updated": updated_task.to_dict()}), 200
 
-    for key, value in data.items():
-        if key in required_fields:
-            setattr(task, key, value)
-            updated = True
-    if updated:
-        session.commit()
-    return jsonify({"task_updated": task.to_dict()}), 200
 
-
-@tasks_api.route('/tasks/<int:id>', methods=['DELETE'])
-def delete_task(id):
-    task = session.query(Task).filter_by(id=id).first()
-    session.delete(task)
-    session.commit()
+@tasks_api.route('/<int:task_id>', methods=['DELETE'])
+def delete_task(task_id):
+    TaskRepository(session).delete_task(task_id)
     return jsonify({"message": "Success"})
 
 
-@tasks_api.route('/tasks/search/', methods=['GET'])
+@tasks_api.route('/search/', methods=['GET'])
 def get_task_by_name():
     name = request.args.get('name')
     if not name:
-        tasks = session.query(Task).order_by(Task.id).all()
-    else:
-        tasks = session.query(Task).filter(Task.name.ilike(f"%{name}%")).all()
-
-    task_list = [{
-        "id": task.id,
-        "name": task.name,
-        "status": task.status
-    } for task in tasks]
-
-    return jsonify(task_list)
+        tasks = TaskRepository(session).get_all_tasks()
+    tasks = TaskRepository(session).get_task_by_name(name)
+    return jsonify([task.to_dict() for task in tasks])
