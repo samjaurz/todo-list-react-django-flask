@@ -1,20 +1,27 @@
 import pytest
-from backend.db_session import SessionLocal
-session = SessionLocal()
+from backend.flask.app import create_app
+from backend.db_session import Base, engine, SessionLocal
+
+@pytest.fixture(scope='session')
+def app():
+    app = create_app()
+    return app
 
 @pytest.fixture(scope='function')
-def app():
-    app.config['TESTING'] = True
-    app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://root:root@localhost:5433/todo_list_test"
+def db_session():
+    connection = engine.connect()
+    transaction = connection.begin()
 
-    with app.app_context():
-        db.create_all()
+    session = SessionLocal(bind=connection)
+    Base.metadata.create_all(bind=connection)
 
-        yield db.session
+    yield session
 
-        db.session.rollback()
-        db.drop_all()
+    transaction.rollback()
+    session.rollback()
+    session.close()
+    connection.close()
 
-@pytest.fixture()
+@pytest.fixture(scope='function')
 def client(app):
     return app.test_client()

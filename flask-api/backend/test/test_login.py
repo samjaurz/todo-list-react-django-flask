@@ -1,46 +1,42 @@
 import json
+from backend.test.conftest import client, db_session
 from backend.repositories.user_repository import UserRepository
-from backend.test.conftest import db_session
-from backend.flask.auth.auth_controller import login
 
-def test_login_user(db_session):
+def test_sign_up_user(client, db_session):
+    payload = {
+        "name": "Samuel",
+        "last_name": "Jauregui",
+        "email": "samjaurz@gmail.com",
+        "password": "123456",
+        "password_confirmation": "123456",
+        "status": True
+    }
 
-    response = login.post(
-        '/login', json={
-            {"name": "samm",
-             "last_name": "jauu",
-             "email": "email3@gmail.com",
-             "password": "123456",
-             "password_confirmation": "123456",
-             "status": "true"
-             }
-        })
+    response = client.post('/auth/sign_up', json=payload)
+
+    print("Status code:", response.status_code)
+    print("Response JSON:", response.get_json())
 
     assert response.status_code == 200
+    json_data = response.get_json()
+    assert "error" not in json_data
+    assert "email" == json_data
 
-    # created_user = UserRepository(db_session).create_user(
-    #     name="Samuel",
-    #     last_name="Jauregui",
-    #     email="samjaurz@gmail.com",
-    #     password="1234567",
-    #     status=True,
-    # )
-    #
-    # post_event = {
-    #     "headers": {
-    #         "content-type": "application/json",
-    #         "x-api-key": "da2-your-api-key",
-    #     },
-    #     "requestContext": {
-    #         "method": "POST"
-    #     },
-    #
-    #     "body": json.dumps({
-    #         "id": created_user.id,
-    #         "name": created_user.name,
-    #         "email": created_user.email,
-    #         "status": created_user.status,
-    #         "password": created_user.password,
-    #     })
-    # }
-    # response = login(post_event)
+def test_login_user(client, db_session):
+    user = UserRepository(db_session).create_user(
+        name="Samuel",
+        last_name="Jauregui",
+        email="Password",
+        password="<PASSWORD>",
+        status=True
+    )
+    payload = {
+        "email": "email3@gmail.com",
+        "password": "123456",
+    }
+
+    response = client.post('/auth/login', json=payload)
+
+    json = f"{"Parsed JSON:", response.get_json()}"
+    print(json)
+
