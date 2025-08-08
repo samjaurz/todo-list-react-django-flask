@@ -65,7 +65,6 @@ def get_user_by_name():
         users = session.query(User).order_by(User.id).all()
     else:
         users = session.query(User).filter(User.name.ilike(f"%{name}%")).all()
-
     users_list = [{
         "id": user.id,
         "name": user.name,
