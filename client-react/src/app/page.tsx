@@ -5,6 +5,7 @@ import Table from "@/components/Table";
 import {useEffect, useState} from "react";
 import getApiInstance from "@/lib/axios";
 import Dropdown from "@/components/Dropdown";
+import NavBar from "@/components/NavBar"
 
 interface Task {
     id: number;
@@ -130,10 +131,8 @@ export default function Home() {
     }
 
     return (
-        <div className="pl-10 pr-10">
-            <div className="justify-center items-center flex text-5xl py-10 font-bold">
-                <h1>TODO LIST</h1>
-            </div>
+        <div>
+            <NavBar />
             <div className="justify-end flex p-3">
                  <Dropdown
                      users={users}

@@ -2,6 +2,7 @@ from flask import Blueprint, jsonify, request
 from backend.db_session import SessionLocal
 import bcrypt
 from backend.repositories.user_repository import UserRepository
+from backend.flask.auth.auth_jwt import JWTAuth
 
 auth_api = Blueprint('auth_api', __name__)
 session = SessionLocal()
@@ -17,8 +18,14 @@ def login():
 
     stored_hash = user.password.encode('utf-8')
 
+    token = JWTAuth().get_access_token({
+        "user_id": user.id,
+        "email": user.email
+    })
+
     if bcrypt.checkpw(password_client, stored_hash):
-        return jsonify({"message": "Password is valid! User authenticated."}), 200
+        return jsonify({"message": "Password is valid! User authenticated."
+                        ,"token": token}), 200
     return jsonify({"error": "Invalid password"}), 401
 
 
