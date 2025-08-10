@@ -1,6 +1,12 @@
 from backend.test.conftest import client, app
 
 def test_login_user(client, admin_account_factory, app):
+    """
+    GIVEN a user register in the database
+    WHEN the user send the login request to the endpoint of auth/login
+    THEN The login is successful and a token is returned
+    """
+
     admin_account_factory()
 
     payload = {
