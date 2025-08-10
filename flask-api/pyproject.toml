@@ -1,0 +1,21 @@
+[project]
+name = "todo-list"
+version = "0.1.0"
+description = "api todo_list on flask"
+authors = [
+    {name = "Samuel Jauregui",email = "samjaurz_@hotmail.com"}
+]
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "alembic (>=1.16.4,<2.0.0)",
+    "flask (>=3.1.1,<4.0.0)",
+    "psycopg2-binary (>=2.9.10,<3.0.0)",
+    "sqlalchemy (>=2.0.42,<3.0.0)",
+    "pytest (>=8.4.1,<9.0.0)"
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
