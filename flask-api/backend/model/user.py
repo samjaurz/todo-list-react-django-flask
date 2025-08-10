@@ -35,7 +35,7 @@ class User(Base):
             "last_name": self.last_name,
             "email": self.email,
             "password": self.password,
-            "status": self.status.__str__(),
+            "status": self.status,
             "created_at": str(self.created_at),
             "updated_at": str(self.updated_at)
         }
