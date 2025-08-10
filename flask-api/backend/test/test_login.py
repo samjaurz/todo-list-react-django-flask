@@ -1,15 +1,20 @@
-import json
-from backend.test.conftest import client, db_session
-from backend.repositories.user_repository import UserRepository
+from backend.test.conftest import client, app
 
-def test_login_user(client, db_session):
+def test_login_user(client, admin_account_factory, app):
+    admin_account_factory()
+
     payload = {
-        "email": "samjaursz@gmail.com",
-        "password": "123456",
+        "email": "test_account@email.com",
+        "password": "12345678",
     }
 
     response = client.post('/auth/login', json=payload)
 
-    json = f"{"Parsed JSON:", response.get_json()}"
-    print(json)
+    print("Parsed JSON:", response.get_json())
+    assert response.status_code == 200
+    data = response.get_json()
+    assert "token" in data
+
+
+
 
