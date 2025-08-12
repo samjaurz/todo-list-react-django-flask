@@ -14,3 +14,9 @@ class JWTAuth:
     def get_access_token(self, payload: dict) -> str:
         return  self._generate_access_token(payload)
 
+
+    def decode_credentials(self, credentials):
+        try:
+            return jwt.decode(credentials, key=self.secret, algorithms=['HS256'])
+        except jwt.ExpiredSignatureError:
+            return None
