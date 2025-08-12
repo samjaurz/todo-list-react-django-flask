@@ -2,6 +2,7 @@ from flask import Blueprint, jsonify, request
 from backend.db_session import SessionLocal
 from backend.model.user import User
 from backend.repositories.user_repository import UserRepository
+from backend.flask.auth.auth_jwt import JWTAuth
 users_api = Blueprint('users_api', __name__)
 session = SessionLocal()
 
@@ -80,3 +81,22 @@ def get_task_by_user_id(user_id: int):
     if not user:
         return jsonify({"message": "user not found"})
     return user
+
+
+@users_api.route('/all_tasks', methods=['GET'])
+def get_task_all_task_by_user():
+    print(request.cookies)
+    token = request.cookies.get('access_token')
+    decode = JWTAuth().decode_credentials(token)
+    print(decode)
+    tasks = UserRepository(session).get_all_tasks_by_user(decode["user_id"])
+    if not tasks:
+        return jsonify({
+            "user_id": decode["user_id"],
+            "message": "tasks not found"})
+    # return tasks
+    return jsonify({
+        "user_id": decode["user_id"],
+        "tasks": tasks
+    })
+
