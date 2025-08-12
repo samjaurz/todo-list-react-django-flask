@@ -11,6 +11,7 @@ const djangoApi = axios.create({
 
 const flaskApi = axios.create({
   baseURL: urlFlask,
+  withCredentials: true,
   timeout: 10000,
   headers: { "Content-Type": "application/json" },
 });
