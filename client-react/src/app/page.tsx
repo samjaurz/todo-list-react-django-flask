@@ -4,7 +4,6 @@ import SearchBar from "@/components/SearhBar";
 import Table from "@/components/Table";
 import {useEffect, useState} from "react";
 import getApiInstance from "@/lib/axios";
-import Dropdown from "@/components/Dropdown";
 import NavBar from "@/components/NavBar"
 
 interface Task {
@@ -26,13 +25,14 @@ export default function Home() {
     const [editingId, setEditingId] = useState<number | null>(null);
     const [apiSelection, setApiSelection] = useState(false)
     const [userId, setUserId] = useState<number>(0);
-    const [users, setUsers] = useState<User[]>([]);
+    //const [users, setUsers] = useState<User[]>([]);
 
     const api = getApiInstance(apiSelection);
 
     const getAllUser = async () => {
         try {
-            const response = await api.get("/users/");
+            const response = await api.get("/users/all_tasks");
+            setUserId(response.data.user_id)
             console.log("Get all users", response.data);
             return response.data;
         } catch (error) {
@@ -42,7 +42,7 @@ export default function Home() {
 
     useEffect(() => {
         getAllUser().then((data) => {
-            setUsers(data ?? []);
+            setTasks(data.tasks ?? []);
         });
     }, []);
 
@@ -122,24 +122,11 @@ export default function Home() {
         const filteredTasks = tasks.filter(el => el.id != task.id);
         setTasks(filteredTasks)
     }
-    const handleFilterUser = async  (user:number) =>{
-        console.log(user,"userFilter")
-        setUserId(user)
-        const response = await api.get(`users/${user}/tasks`)
-        console.log("user_selected", response.data)
-        setTasks(response.data);
-    }
+
 
     return (
         <div>
             <NavBar />
-            <div className="justify-end flex p-3">
-                 <Dropdown
-                     users={users}
-                     handleFilterUser = {handleFilterUser}
-                 />
-            </div>
-
             <SearchBar
                 tasks={tasks}
                 handleSearch={handleSearch}
