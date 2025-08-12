@@ -25,7 +25,7 @@ export default function SignupPage() {
     };
     const response = await api.post("auth/sign_up", payload);
     console.log("response from signup", response.data);
-    if (response.status === 200) {
+    if (response.status === 201) {
       router.push("/");
     }
   };
