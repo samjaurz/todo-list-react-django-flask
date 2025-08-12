@@ -11,7 +11,12 @@ def create_app(config_object=None):
     if config_object:
         app.config.from_object(config_object)
 
-    CORS(app)
+    CORS(app, resources={
+        r"/*": {
+            "origins": ["http://localhost:3000"],
+            "supports_credentials": True,
+        }
+    })
 
     app.register_blueprint(tasks_api, url_prefix='/tasks')
     app.register_blueprint(users_api, url_prefix='/users')
