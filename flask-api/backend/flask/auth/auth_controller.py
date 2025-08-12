@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, make_response
 from backend.db_session import with_db_session
 import bcrypt
 from backend.repositories.user_repository import UserRepository
@@ -24,8 +24,18 @@ def login(session):
     })
 
     if bcrypt.checkpw(password_client, stored_hash):
-        return jsonify({"message": "Password is valid! User authenticated."
-                        ,"token": token}), 200
+        response = jsonify({"message": "Password is valid! User authenticated."
+                        ,"access_token": token})
+        response.status_code = 200
+        response.set_cookie(
+            'access_token',
+            value=token,
+            samesite='None',
+            httponly=True,
+            secure=True,
+            max_age=3600,
+        )
+        return response
     return jsonify({"error": "Invalid password"}), 401
 
 
@@ -47,8 +57,21 @@ def sign_up(session):
         last_name=data['last_name'],
         email=data['email'],
         password=hashed.decode('utf-8'),
-        status=data['status'],
+        status=True,
     )
-    return jsonify(created_user.to_dict())
+
+    token = JWTAuth().get_access_token({
+        "user_id": created_user.id,
+        "email": created_user.email
+    })
+
+    response = jsonify({"message": "Password is valid! User authenticated."
+                           , "access_token": token})
+    response.status_code = 201
+    response.set_cookie("access_token",
+                        value=token,
+                        httponly=True,
+                        )
+    return response
 
 
