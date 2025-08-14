@@ -94,14 +94,16 @@ def get_task_by_user_id(session, user_id: int):
 def get_task_all_task_by_user(session):
     print(request.cookies)
     token = request.cookies.get('access_token')
+    if not token:
+        return jsonify({"error": "Token missing"}), 401
     decode = JWTAuth().decode_credentials(token)
     print(decode)
     tasks = UserRepository(session).get_all_tasks_by_user(decode["user_id"])
     if not tasks:
         return jsonify({
             "user_id": decode["user_id"],
-            "message": "tasks not found"})
+            "message": "tasks not found"}) , 401
     return jsonify({
         "user_id": decode["user_id"],
         "tasks": tasks
-    })
+    }), 200
