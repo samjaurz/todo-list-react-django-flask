@@ -1,9 +1,22 @@
 'use client'
 import React from "react";
 import {useRouter} from "next/navigation";
+import getApiInstance from "@/lib/axios";
 
 const Navbar = () => {
     const router = useRouter();
+    const api = getApiInstance(false);
+    const handleLogOut = async () => {
+
+        const response = await api.post('auth/logout');
+        console.log("response from login", response.data)
+
+        if (response.status === 200) {
+            router.push("/");
+        } else {
+            console.log("Not authorized");
+        }
+    };
     return (
         <nav className="flex items-center justify-between p-4 bg-gray-800 text-white shadow-md">
             <h1 className="text-xl font-bold">TODO LIST</h1>
@@ -23,7 +36,7 @@ const Navbar = () => {
                     Signup
                 </button>
                 <button
-                    onClick={() => router.push("/signup")}
+                    onClick={handleLogOut}
                     className="bg-blue-500 hover:bg-blue-600 text-white p-2 rounded cursor-pointer transition"
                 >
                     Sign Out
