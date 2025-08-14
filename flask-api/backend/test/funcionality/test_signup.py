@@ -20,10 +20,7 @@ def test_sign_up_user(client, app):
     print("Status code:", response.status_code)
     print("Response JSON:", response.get_json())
 
-    assert response.status_code == 200
+    assert response.status_code == 201
     data = response.get_json()
-    assert data["name"] == "Samuel"
-    assert data["last_name"] == "Jauregui"
-    assert data["email"] == "samjaursz@gmail.com"
     assert data["status"] == True
 

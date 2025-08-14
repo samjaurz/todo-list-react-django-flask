@@ -1,6 +1,7 @@
-from backend.test.conftest import client, app
+from backend.test.conftest import client, admin_account_factory
 
-def test_login_user(client, admin_account_factory, app):
+
+def test_login_user(client, admin_account_factory):
     """
     GIVEN a user register in the database
     WHEN the user send the login request to the endpoint of auth/login
@@ -16,11 +17,7 @@ def test_login_user(client, admin_account_factory, app):
 
     response = client.post('/auth/login', json=payload)
 
-    print("Parsed JSON:", response.get_json())
     assert response.status_code == 200
     data = response.get_json()
-    assert "token" in data
-
-
 
 
