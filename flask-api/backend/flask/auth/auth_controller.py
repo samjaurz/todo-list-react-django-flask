@@ -69,9 +69,22 @@ def sign_up(session):
                            , "access_token": token})
     response.status_code = 201
     response.set_cookie("access_token",
-                        value=token,
                         httponly=True,
+                        samesite='None',
+                        secure=True,
+                        max_age=3600,
                         )
     return response
 
 
+@auth_api.route('/logout', methods=['POST'])
+def logout():
+    response = jsonify({"message": "Deleted Cookie"})
+    response.status_code = 200
+    response.delete_cookie(
+        'access_token',
+        httponly=True,
+        samesite='None',
+        secure=True
+    )
+    return response
