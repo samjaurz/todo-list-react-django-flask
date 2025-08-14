@@ -11,7 +11,6 @@ export default function SignupPage() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
-
   const api = getApiInstance(false);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -26,7 +25,7 @@ export default function SignupPage() {
     const response = await api.post("auth/sign_up", payload);
     console.log("response from signup", response.data);
     if (response.status === 201) {
-      router.push("/");
+      router.push("/tasks");
     }
   };
 

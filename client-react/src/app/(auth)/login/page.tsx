@@ -21,7 +21,7 @@ export default function LoginPage() {
         console.log("response from login", response.data)
 
         if (response.status === 200) {
-        router.push("/");
+        router.push("/tasks");
       } else {
       console.log("Not authorized");
     }
