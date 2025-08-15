@@ -1,14 +1,14 @@
-from backend.test.conftest import client, admin_account_factory
+from backend.test.conftest import client
 
 
-def test_login_user(client, admin_account_factory):
+def test_login_user(client, admin_user_factory):
     """
     GIVEN a user register in the database
     WHEN the user send the login request to the endpoint of auth/login
     THEN The login is successful and a token is returned
     """
 
-    admin_account_factory()
+    admin_user_factory()
 
     payload = {
         "email": "test_account@email.com",
@@ -19,5 +19,7 @@ def test_login_user(client, admin_account_factory):
 
     assert response.status_code == 200
     data = response.get_json()
+    assert "access_token" in data
+    assert data["message"] == "Password is valid! User authenticated."
 
 

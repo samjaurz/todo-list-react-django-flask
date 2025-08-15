@@ -1,6 +1,6 @@
 from backend.test.conftest import client, app
 
-def test_sign_up_user(client, app):
+def test_sign_up_user(client):
     """
         GIVEN field of user data for registration
         WHEN the user send the request to the endpoint of auth/sign_up
@@ -16,11 +16,11 @@ def test_sign_up_user(client, app):
     }
 
     response = client.post('/auth/sign_up', json=payload)
-
-    print("Status code:", response.status_code)
-    print("Response JSON:", response.get_json())
-
     assert response.status_code == 201
     data = response.get_json()
-    assert data["status"] == True
+    assert "access_token" in data
+    assert data["message"] == "Password is valid! User authenticated."
+
+
+
 
