@@ -2,7 +2,9 @@ from flask import Blueprint, jsonify, request
 from backend.db_session import with_db_session
 from backend.repositories.task_repository import TaskRepository
 from backend.flask.auth.decorator import auth_decorator
+
 tasks_api = Blueprint('tasks_api', __name__)
+
 
 @tasks_api.route('/', methods=['POST'])
 @with_db_session
@@ -24,17 +26,7 @@ def get_task_by_id(session, task_id: int):
     read_task = TaskRepository(session).get_task_by_id(task_id)
     if read_task is None:
         return jsonify({"message": "task not found"}), 404
-    return jsonify(read_task.to_dict()),200
-
-
-@tasks_api.route('/', methods=['GET'])
-@with_db_session
-@auth_decorator
-def get_task_all(session):
-    tasks = TaskRepository(session).get_all_tasks()
-    if not tasks:
-        return jsonify({"message": "No tasks found"}), 404
-    return jsonify([task.to_dict() for task in tasks]), 200
+    return jsonify(read_task.to_dict()), 200
 
 
 @tasks_api.route('/<int:task_id>', methods=['PUT'])
@@ -65,11 +57,10 @@ def delete_task(session, task_id: int):
 
 @tasks_api.route('/search/', methods=['GET'])
 @with_db_session
-@auth_decorator
 def get_task_by_name(session):
     name = request.args.get('name')
     if not name:
         tasks = TaskRepository(session).get_all_tasks()
     else:
         tasks = TaskRepository(session).get_task_by_name(name)
-    return jsonify([task.to_dict() for task in tasks]), 200
+    return jsonify([task.to_dict() for task in tasks])
