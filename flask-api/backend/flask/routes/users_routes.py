@@ -3,6 +3,7 @@ from backend.db_session import with_db_session
 from backend.model.user import User
 from backend.repositories.user_repository import UserRepository
 from backend.flask.auth.auth_jwt import JWTAuth
+from backend.flask.auth.decorator import auth_decorator
 
 users_api = Blueprint('users_api', __name__)
 
@@ -21,11 +22,13 @@ def create_user(session):
 
 @users_api.route('/<int:user_id>', methods=['GET'])
 @with_db_session
+@auth_decorator
 def get_user_by_id(session, user_id: int):
+    print(user_id)
     read_user = UserRepository(session).get_user_by_id(user_id)
     if read_user is None:
         return jsonify({"message": "user not found"})
-    return jsonify(read_user.to_dict())
+    return jsonify(read_user.to_dict()), 200
 
 @users_api.route('/', methods=['GET'])
 @with_db_session
