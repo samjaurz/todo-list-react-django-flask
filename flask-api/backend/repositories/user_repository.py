@@ -40,6 +40,13 @@ class UserRepository:
         tasks = user.task
         return [task.to_dict() for task in tasks]
 
+    def search_tasks_by_user_and_name(self, user_id: int , name: str) -> list[Type[Task]] | None:
+        user = self.session.query(User).filter_by(id=user_id).first()
+        if user is None:
+            return None
+        tasks = user.task.filter(name.ilike(f"%{name}%"))
+        return [task.to_dict() for task in tasks]
+
     def delete_user(self, user_id: int) -> bool:
         user = self.session.query(User).filter_by(id=user_id).first()
         if user:
