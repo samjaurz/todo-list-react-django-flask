@@ -11,6 +11,8 @@ def auth_decorator(func):
         decode = JWTAuth().decode_credentials(token)
         if not decode:
             return jsonify({"error": "This token is invalid"})
+
         return func(session,**kwargs)
     return wrapper
+
 

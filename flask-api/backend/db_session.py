@@ -24,7 +24,6 @@ class SessionFactory:
 def with_db_session(f):
     @wraps(f)
     def wrapper(*args, **kwargs):
-        # Get factory from Flask app context
         db_gen = current_app.db_factory.get_db()
         session = next(db_gen)
         try:
@@ -35,7 +34,7 @@ def with_db_session(f):
         finally:
             session.close()
             try:
-                next(db_gen)  # Clean up generator
+                next(db_gen)
             except StopIteration:
                 pass
     return wrapper
