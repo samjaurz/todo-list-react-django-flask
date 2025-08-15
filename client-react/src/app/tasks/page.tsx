@@ -90,9 +90,9 @@ export default function Home() {
     }
     const handleSearch = async (searchTask: string) => {
         console.log("search handle", searchTask)
-        const response = await api.get(`tasks/search?name=${searchTask}`)
+        const response = await api.get(`users/search?name=${searchTask}`)
         console.log("response handle search after api", response)
-        setTasks(response.data)
+        setTasks(response.data["tasks"])
     }
     const handleSave = async (updated: Task) => {
         console.log("updated", updated)
@@ -128,7 +128,6 @@ export default function Home() {
         const filteredTasks = tasks.filter(el => el.id != task.id);
         setTasks(filteredTasks)
     }
-
 
     return (
         <div>

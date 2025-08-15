@@ -5,7 +5,6 @@ from backend.flask.auth.decorator import auth_decorator
 
 tasks_api = Blueprint('tasks_api', __name__)
 
-
 @tasks_api.route('/', methods=['POST'])
 @with_db_session
 @auth_decorator
@@ -54,13 +53,3 @@ def delete_task(session, task_id: int):
         return jsonify({"message": "Task not found"}), 404
     return jsonify({"message": "Task deleted successfully"}), 200
 
-
-@tasks_api.route('/search/', methods=['GET'])
-@with_db_session
-def get_task_by_name(session):
-    name = request.args.get('name')
-    if not name:
-        tasks = TaskRepository(session).get_all_tasks()
-    else:
-        tasks = TaskRepository(session).get_task_by_name(name)
-    return jsonify([task.to_dict() for task in tasks])
