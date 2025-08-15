@@ -3,6 +3,7 @@ from backend.flask.app import create_app
 from backend.flask.auth.auth_jwt import JWTAuth
 from backend.model import Base
 from backend.model.user import User
+from backend.model.task import Task
 from backend.db_session import SessionFactory
 import bcrypt
 
@@ -37,8 +38,8 @@ def client(app):
 
 
 @pytest.fixture
-def admin_account_factory(db_session):
-    def _create_user(commit=True):
+def admin_user_factory(db_session):
+    def _create_user():
         password_client = "12345678"
         hashed = bcrypt.hashpw(password_client.encode(), bcrypt.gensalt()).decode()
 
@@ -51,41 +52,40 @@ def admin_account_factory(db_session):
         )
         db_session.add(user)
         db_session.commit()
-        return {
-            "user_id": user.id,
-            "username": user.email,
-        }
+        return user.to_dict()
 
     return _create_user
 
 
 @pytest.fixture
-def token_factory(db_session):
-    def _token_user(commit=True):
-        password_client = "12345678"
-        hashed = bcrypt.hashpw(password_client.encode(), bcrypt.gensalt()).decode()
+def gen_token(db_session, admin_user_factory):
+    user = admin_user_factory()
+    token = JWTAuth().get_access_token({
+        "user_id": user["id"],
+        "email": user["email"],
+    })
 
-        user = User(
-            name="Samuel",
-            last_name="Jauregui",
-            email="test_account@email.com",
-            password=hashed,
-            status=True,
+    return {
+        "user": user,
+        "access_token": token
+    }
+
+
+@pytest.fixture
+def task_factory(db_session, gen_token):
+    def _create_task():
+        user_id = gen_token["user"]["id"]
+        task = Task(
+            name= "test_task",
+            status=False,
+            user_id = user_id,
         )
-        db_session.add(user)
+        db_session.add(task)
         db_session.commit()
 
-        token = JWTAuth().get_access_token({
-            "user_id": user.id,
-            "email": user.email
-        })
-
         return {
-            "info": {
-                "user_id": user.id,
-                "username": user.email,
-            },
-            "access_token": token
+            "task": task.to_dict(),
+            "access_token": gen_token["access_token"]
         }
 
-    return _token_user
+    return _create_task
