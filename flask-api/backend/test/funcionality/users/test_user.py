@@ -74,6 +74,7 @@ def test_search_all_task_by_user(client, gen_token, task_factory):
         secure=True
     )
 
-    response = client.get(f'users/search/{user_id}/tasks')
+    response = client.get('users/search/?name=Tas')
+    assert response.status_code == 200
     data = response.get_json()
-    print(data)
+    assert data["tasks"][0]["name"] == "test_task"
