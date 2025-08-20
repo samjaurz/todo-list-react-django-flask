@@ -3,12 +3,14 @@ import getApiInstance from "@/lib/axios";
 import {useRouter} from "next/navigation";
 import React, {useState} from "react";
 
+
 export default function LoginPage() {
 
     // const [apiSelection, setApiSelection] = useState(false)
     const router = useRouter();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+
 
     const api = getApiInstance(false);
     const handleSubmit = async (e:React.FormEvent<HTMLFormElement>) => {
@@ -18,10 +20,13 @@ export default function LoginPage() {
             "password": password
         }
         const response = await api.post('auth/login', payload);
-        console.log("response from login", response.data)
-
         if (response.status === 200) {
-        router.push("/tasks");
+            const access_token = response.data["access_token"];
+            sessionStorage.setItem('access_token', access_token);
+            api.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
+            sessionStorage.setItem('user_id', response.data["user_id"])
+            console.log("response from login", response.data);
+            router.push("/tasks");
       } else {
       console.log("Not authorized");
     }
