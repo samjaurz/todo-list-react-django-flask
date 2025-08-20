@@ -5,7 +5,8 @@ import Table from "@/components/Table";
 import {useEffect, useState} from "react";
 import getApiInstance from "@/lib/axios";
 import NavBar from "@/components/NavBar"
-import { useRouter } from "next/navigation";
+import {useRouter} from "next/navigation";
+import {jwtDecode} from "jwt-decode" ;
 
 interface Task {
     id: number;
@@ -14,31 +15,35 @@ interface Task {
     user_id: number;
 }
 
-interface User {
-    id: number,
-    name: string,
-    last_name: string,
-    status: boolean
-}
 
 export default function Home() {
     const [tasks, setTasks] = useState<Task[]>([]);
     const [editingId, setEditingId] = useState<number | null>(null);
     const [apiSelection, setApiSelection] = useState(false)
     const [userId, setUserId] = useState<number>(0);
-    //const [users, setUsers] = useState<User[]>([]);
+
 
     const api = getApiInstance(apiSelection);
     const router = useRouter()
+
+    // const bearer: string | null = sessionStorage.getItem('access_token');
+    // console.log("bearer", bearer);
+    // if (bearer) {
+    // const decoded = jwtDecode(bearer);
+    // console.log('decoded user:', decoded);
+    // }
+
+
     const getAllUser = async () => {
         try {
-            const response = await api.get("/users/all_tasks");
+            const user_id: number = Number(sessionStorage.getItem('user_id'));
+            const response = await api.get(`/users/${user_id}/get_tasks`);
             console.log(response.status)
             if (response.status === 200) {
-            setUserId(response.data.user_id);
-            console.log("Get all users", response.data);
-            return response.data;
-        }
+                setUserId(response.data.user_id);
+                console.log("Get all users", response.data);
+                return response.data;
+            }
         } catch (error) {
             console.error("Error Axios", error);
             router.push("/");
@@ -51,6 +56,11 @@ export default function Home() {
             setTasks(data.tasks ?? []);
         });
     }, []);
+
+    // const handleRefresh = async () => {
+    //     const response = await api.post('auth/refresh');
+    //     console.log("response_refresh_token", response)
+    // }
 
     const handleEdit = (task: Task) => {
         console.log("task edit", task.id)
@@ -76,7 +86,7 @@ export default function Home() {
         if (addId_0) {
             return
         }
-        console.log(tasks,"task add handler")
+        console.log(tasks, "task add handler")
         const new_tasks = [{
             id: 0,
             status: false,
@@ -131,7 +141,7 @@ export default function Home() {
 
     return (
         <div>
-            <NavBar />
+            <NavBar/>
             <SearchBar
                 tasks={tasks}
                 handleSearch={handleSearch}
