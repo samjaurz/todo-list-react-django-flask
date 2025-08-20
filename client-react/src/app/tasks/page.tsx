@@ -33,7 +33,6 @@ export default function Home() {
     // console.log('decoded user:', decoded);
     // }
 
-
     const getAllUser = async () => {
         try {
             const user_id: number = Number(sessionStorage.getItem('user_id'));
@@ -46,6 +45,7 @@ export default function Home() {
             }
         } catch (error) {
             console.error("Error Axios", error);
+            console.log("error from not getting task")
             router.push("/");
             return null;
         }
@@ -100,7 +100,8 @@ export default function Home() {
     }
     const handleSearch = async (searchTask: string) => {
         console.log("search handle", searchTask)
-        const response = await api.get(`users/search?name=${searchTask}`)
+        const user_id: number = Number(sessionStorage.getItem('user_id'));
+        const response = await api.get(`users/${user_id}/search?name=${searchTask}`)
         console.log("response handle search after api", response)
         setTasks(response.data["tasks"])
     }
