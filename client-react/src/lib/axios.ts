@@ -1,23 +1,26 @@
-import axios, {AxiosInstance}from "axios";
+import axios, {AxiosInstance} from "axios";
 
 const urlDjango = "http://127.0.0.1:8000/";
 const urlFlask = "http://127.0.0.1:5000/";
 
 const djangoApi = axios.create({
-  baseURL: urlDjango,
-  timeout: 10000,
-  headers: { "Content-Type": "application/json" },
+    baseURL: urlDjango,
+    timeout: 10000,
+    headers: {"Content-Type": "application/json"},
 });
 
 const flaskApi = axios.create({
-  baseURL: urlFlask,
-  withCredentials: true,
-  timeout: 10000,
-  headers: { "Content-Type": "application/json" },
+    baseURL: urlFlask,
+    withCredentials: true,
+    timeout: 10000,
+    headers: {
+        "Content-Type": "application/json",
+        'Authorization': `Bearer ${sessionStorage.getItem('access_token')}`
+    },
 });
 
 function getApiInstance(useDjango: boolean): AxiosInstance {
-  return useDjango ? djangoApi : flaskApi;
+    return useDjango ? djangoApi : flaskApi;
 }
 
 export default getApiInstance;

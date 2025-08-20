@@ -25,4 +25,5 @@ class JWTAuth:
         try:
             return jwt.decode(credentials, key=self.secret, algorithms=['HS256'])
         except jwt.ExpiredSignatureError:
-            return None
+            return {"error": "token expired"}
+

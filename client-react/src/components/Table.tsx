@@ -46,7 +46,7 @@ const Table = ({tasks, editingId, onEdit, onSave, setEditingId, onDelete, handle
                     )) : (
                     <tr>
                         <td colSpan={4} className="text-center p-4 text-gray-500">
-                            No tasks found.
+                            No tasks created yet
                         </td>
                     </tr>
                 )}
