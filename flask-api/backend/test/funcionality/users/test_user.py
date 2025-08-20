@@ -9,13 +9,13 @@ def test_read_user(client, gen_token):
 
     user_id = gen_token["user"]["id"]
     client.set_cookie(
-        'access_token',
-        value=gen_token["access_token"],
+        'refresh_token',
+        value=gen_token["tokens"]["refresh_token"],
         samesite='None',
         httponly=True,
         secure=True
     )
-    response = client.get(f'/users/{user_id}')
+    response = client.get(f'/users/{user_id}', headers={"Authorization": f"Bearer {gen_token['tokens']['access_token']}"})
 
     assert response.status_code == 200
     data = response.get_json()
@@ -39,13 +39,13 @@ def test_get_all_task_by_user(client, gen_token, task_factory):
     task_factory()
     task_factory()
     client.set_cookie(
-        'access_token',
-        value=gen_token["access_token"],
+        'refresh_token',
+        value=gen_token["tokens"]["refresh_token"],
         samesite='None',
         httponly=True,
         secure=True
     )
-    response = client.get('/users/all_tasks')
+    response = client.get('/users/all_tasks', headers={"Authorization": f"Bearer {gen_token['tokens']['access_token']}"})
     data = response.get_json()
     assert response.status_code == 200
     assert data["user_id"] == user_id

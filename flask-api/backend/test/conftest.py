@@ -67,7 +67,7 @@ def gen_token(db_session, admin_user_factory):
 
     return {
         "user": user,
-        "access_token": token
+        "tokens": token
     }
 
 
@@ -85,7 +85,7 @@ def task_factory(db_session, gen_token):
 
         return {
             "task": task.to_dict(),
-            "access_token": gen_token["access_token"]
+            "tokens": gen_token["tokens"]
         }
 
     return _create_task
