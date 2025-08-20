@@ -5,9 +5,9 @@ from functools import wraps
 def auth_decorator(func):
     @wraps(func)
     def wrapper(session, **kwargs):
-        print(request.headers)
+        print("headers",request.headers)
         token = request.headers.get('Authorization').split()[1]
-        print(token)
+        print("token", token)
         if not token:
             return jsonify({"error": "Token missing"}), 401
         decode = JWTAuth().decode_credentials(token)

@@ -23,8 +23,8 @@ export default function LoginPage() {
         if (response.status === 200) {
             const access_token = response.data["access_token"];
             sessionStorage.setItem('access_token', access_token);
-            api.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
             sessionStorage.setItem('user_id', response.data["user_id"])
+            api.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
             console.log("response from login", response.data);
             router.push("/tasks");
       } else {

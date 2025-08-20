@@ -12,6 +12,8 @@ auth_api = Blueprint('auth_api', __name__)
 @auth_api.route('/login', methods=['POST'])
 @with_db_session
 def login(session):
+    print(request.headers)
+
     data = request.get_json()
     password_client = data['password'].encode('utf-8')
 
@@ -24,10 +26,30 @@ def login(session):
         return jsonify({"error": "Invalid password"}), 401
 
     tokens = JWTAuth().get_access_token({
-            "user_id": user.id,
-            "email": user.email
+        "user_id": user.id,
+        "email": user.email
     })
 
+    salt = bcrypt.gensalt()
+    refresh_token_prev = tokens["refresh_token"].encode('utf-8')
+    refresh_token_hashed = bcrypt.hashpw(refresh_token_prev, salt)
+    user_agent = request.headers.get('User-Agent', 'Unknown')
+
+    retrieve_refresh_db = RefreshTokenRepository(session).get_refresh_token_by_user_id(user.id)
+    if retrieve_refresh_db:
+        RefreshTokenRepository(session).update_refresh_token(
+            refresh_token_id=retrieve_refresh_db.id,
+            **{
+                "token_hash": refresh_token_hashed.decode('utf-8'),
+                "user_agent": user_agent,
+            }
+        )
+    else:
+        RefreshTokenRepository(session).create_refresh_token(
+            token_hash=refresh_token_hashed.decode('utf-8'),
+            user_agent=user_agent,
+            user_id=user.id,
+        )
     response = jsonify({"message": "Login successful",
                         "user_id": user.id,
                         "access_token": tokens["access_token"]})
@@ -69,9 +91,20 @@ def sign_up(session):
         "email": created_user.email
     })
 
-    response = jsonify({"message": "Sign up successful"})
+    refresh_token_prev = tokens["refresh_token"].encode('utf-8')
+    refresh_token_hashed = bcrypt.hashpw(refresh_token_prev, salt)
+    user_agent = request.headers.get('User-Agent', 'Unknown')
+
+    RefreshTokenRepository(session).create_refresh_token(
+        token_hash=refresh_token_hashed.decode('utf-8'),
+        user_agent=user_agent,
+        user_id=created_user.id,
+    )
+
+    response = jsonify({"message": "Sign up successful",
+                        "user_id": created_user.id,
+                        "access_token": tokens["access_token"]})
     response.status_code = 201
-    response.headers["Authorization"] = f"Bearer {tokens["access_token"]}"
     response.set_cookie(
         'refresh_token',
         value=tokens["refresh_token"],
@@ -105,22 +138,26 @@ def validate_refresh_token(session):
     if not decode:
         return jsonify({"error": " Invalid token: session expired"}), 401
 
-    retrieve_refresh_db =  RefreshTokenRepository(session).get_refresh_token_user_id(decode["user_id"])
-
-    updated_refresh = RefreshTokenRepository(session).update_refresh_token(
-    refresh_token_id = retrieve_refresh_db.id,
-        **{
-            "token_hash": "updated_token_hash",
-            "revoked": False,
-            "ip_address": "updated_ip_address"
-        })
-
     tokens = JWTAuth().get_access_token({
         "user_id": decode["user_id"],
         "email": decode["email"]
     })
 
+    retrieve_refresh_db = RefreshTokenRepository(session).get_refresh_token_by_user_id(decode["user_id"])
 
+    salt = bcrypt.gensalt()
+    refresh_token_prev = tokens["refresh_token"].encode('utf-8')
+    refresh_token_hashed = bcrypt.hashpw(refresh_token_prev, salt)
+    user_agent = request.headers.get('User-Agent', 'Unknown')
+
+
+    RefreshTokenRepository(session).update_refresh_token(
+        refresh_token_id=retrieve_refresh_db.id,
+        **{
+            "token_hash": refresh_token_hashed.decode('utf-8'),
+            "user_agent": user_agent,
+        }
+    )
 
     response = jsonify({"message": "Generate token successful",
                         "access_token": tokens["access_token"]})
@@ -135,4 +172,3 @@ def validate_refresh_token(session):
     )
 
     return response
-
