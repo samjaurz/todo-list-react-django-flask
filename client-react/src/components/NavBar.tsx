@@ -12,6 +12,8 @@ const Navbar = () => {
         console.log("response from login", response.data)
 
         if (response.status === 200) {
+            sessionStorage.removeItem('user_id');
+            sessionStorage.removeItem('access_token');
             router.push("/");
         } else {
             console.log("Not authorized");
