@@ -3,9 +3,8 @@ from backend.db_session import with_db_session
 import bcrypt
 from backend.repositories.user_repository import UserRepository
 from backend.repositories.refresh_token_repository import RefreshTokenRepository
-
 from backend.flask.auth.auth_jwt import JWTAuth
-
+from backend.flask.auth.send_email import EmailSender
 auth_api = Blueprint('auth_api', __name__)
 
 
@@ -20,6 +19,10 @@ def login(session):
     user = UserRepository(session).get_user_by_email(data['email'])
     if not user:
         return jsonify({"error": "User not found"}), 404
+    if user.status is False:
+        return jsonify({"error": "User is not verified",
+                        "user_id": user.id,
+                        }),403
 
     stored_hash = user.password.encode('utf-8')
     if not bcrypt.checkpw(password_client, stored_hash):
@@ -101,19 +104,13 @@ def sign_up(session):
         user_id=created_user.id,
     )
 
-    response = jsonify({"message": "Sign up successful",
-                        "user_id": created_user.id,
-                        "access_token": tokens["access_token"]})
-    response.status_code = 201
-    response.set_cookie(
-        'refresh_token',
-        value=tokens["refresh_token"],
-        samesite='None',
-        httponly=True,
-        secure=True,
-        max_age=604800,
+    EmailSender().send_email(
+        to = created_user.email,
+        token = tokens["access_token"],
     )
-    return response
+
+    return jsonify({"message": "Sign up successful",
+                        "user_id": created_user.id}), 201
 
 
 @auth_api.route('/logout', methods=['POST'])
@@ -132,7 +129,6 @@ def logout():
 @auth_api.route('/refresh', methods=['GET'])
 @with_db_session
 def validate_refresh_token(session):
-    print("sdsd")
     refresh_token = request.cookies.get('refresh_token')
     decode = JWTAuth().decode_credentials(refresh_token)
     if not decode:
@@ -172,3 +168,13 @@ def validate_refresh_token(session):
     )
 
     return response
+
+
+
+@auth_api.route('/verification', methods=['GET'])
+def verification():
+    pass
+
+
+
+
