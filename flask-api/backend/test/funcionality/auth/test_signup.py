@@ -9,7 +9,7 @@ def test_sign_up_user(client):
     payload = {
         "name": "Test Name",
         "last_name": "Last Test ",
-        "email": "Test@Test.com",
+        "email": "Samjaurz@gmail.com",
         "password": "123456",
         "password_confirmation": "123456",
         "status": True
