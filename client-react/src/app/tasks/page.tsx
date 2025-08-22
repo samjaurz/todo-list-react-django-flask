@@ -29,8 +29,8 @@ export default function Home() {
     // const bearer: string | null = sessionStorage.getItem('access_token');
     // console.log("bearer", bearer);
     // if (bearer) {
-    // const decoded = jwtDecode(bearer);
-    // console.log('decoded user:', decoded);
+    //     const decoded = jwtDecode(bearer);
+    //     console.log('decoded user:', decoded);
     // }
 
     const getAllUser = async () => {
@@ -43,7 +43,14 @@ export default function Home() {
                 console.log("Get all users", response.data);
                 return response.data;
             }
-        } catch (error) {
+        } catch (error: any) {
+            if (error.response.status === 404) {
+                const response = await api.post('auth/refresh');
+                console.log("response from verification", error.response.data);
+                console.log("response_refresh_token", response)
+
+            }
+            sessionStorage.setItem('user_id', error.response.data["user_id"]);
             console.error("Error Axios", error);
             console.log("error from not getting task")
             router.push("/");
@@ -57,10 +64,6 @@ export default function Home() {
         });
     }, []);
 
-    // const handleRefresh = async () => {
-    //     const response = await api.post('auth/refresh');
-    //     console.log("response_refresh_token", response)
-    // }
 
     const handleEdit = (task: Task) => {
         console.log("task edit", task.id)
