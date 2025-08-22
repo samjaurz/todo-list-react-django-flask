@@ -40,6 +40,21 @@ class UserRepository:
         tasks = user.task
         return [task.to_dict() for task in tasks]
 
+    def update_user(self, user_id: int, **kwargs) -> Type[User] | None:
+        user = self.session.query(User).filter_by(id=user_id).first()
+        if not user:
+            return None
+        required_fields = ["name", "last_name", "email", "status"]
+
+        updated = False
+        for key, value in kwargs.items():
+            if key in required_fields:
+                setattr(user, key, value)
+                updated = True
+            if updated:
+                self.session.commit()
+        return user
+
     def search_tasks_by_user_and_name(self, user_id: int , name: str) -> list[Type[Task]] | None:
         user = self.session.query(User).filter_by(id=user_id).first()
         if user is None:
