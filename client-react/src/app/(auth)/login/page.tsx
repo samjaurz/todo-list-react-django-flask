@@ -13,24 +13,33 @@ export default function LoginPage() {
 
 
     const api = getApiInstance(false);
-    const handleSubmit = async (e:React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         const payload = {
             "email": email,
             "password": password
         }
-        const response = await api.post('auth/login', payload);
-        if (response.status === 200) {
-            const access_token = response.data["access_token"];
-            sessionStorage.setItem('access_token', access_token);
-            sessionStorage.setItem('user_id', response.data["user_id"])
-            api.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
-            console.log("response from login", response.data);
-            router.push("/tasks");
-      } else {
-      console.log("Not authorized");
+
+        try {
+            const response = await api.post('auth/login', payload);
+            if (response.status === 200) {
+                const access_token = response.data["access_token"];
+                sessionStorage.setItem('access_token', access_token);
+                sessionStorage.setItem('user_id', response.data["user_id"]);
+                api.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
+                console.log("response from login", response.data);
+                router.push("/tasks");
+            }
+        } catch (error: any) {
+            if (error.response.status === 403) {
+                sessionStorage.setItem('user_id', error.response.data["user_id"]);
+                console.log("response from verification", error.response.data);
+                router.push("/verification");
+            }
+            console.log("error", error);
+            console.log("Not authorized");
+        }
     }
-    };
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-100">
