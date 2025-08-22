@@ -48,7 +48,7 @@ def admin_user_factory(db_session):
             last_name="Jauregui",
             email="test_account@email.com",
             password=hashed,
-            status=True,
+            status=False,
         )
         db_session.add(user)
         db_session.commit()
