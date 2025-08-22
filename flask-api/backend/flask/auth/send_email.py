@@ -20,7 +20,7 @@ class EmailSender:
                 <html>
                 <head></head>
                 <body>
-                <a href="http://localhost:3000/verification?token={tokens}">
+                <a href="http://localhost:3000/verification?token={tokens}&email={to}">
                 <button type="button">Verified</button>
                 </a>
                 </body>
@@ -28,6 +28,7 @@ class EmailSender:
                """
 
         html = html.replace("{tokens}", tokens)
+        html = html.replace("{to}", to)
         part1 = MIMEText(text, 'plain')
         part2 = MIMEText(html, 'html')
 
