@@ -24,6 +24,7 @@ def login(session):
     if user.status is False:
         return jsonify({"error": "User is not verified",
                         "user_id": user.id,
+                        "email": user.email
                         }),403
 
     stored_hash = user.password.encode('utf-8')
@@ -182,7 +183,7 @@ def verification(session):
         return jsonify({"error": "Token missing"}), 401
     decode = JWTAuth().decode_credentials(token)
     if not decode:
-        return jsonify({"error": "This token is invalid"})
+        return jsonify({"error": "This token is invalid"}), 404
 
     user = UserRepository(session).get_user_by_id(decode["user_id"])
     if not user:
@@ -232,5 +233,41 @@ def verification(session):
 
 
 
+@auth_api.route('/resend_email_verification', methods=['POST'])
+@with_db_session
+def resend_email_verification(session):
+    print(request)
+    data = request.get_json()
+    print(data)
+    user = UserRepository(session).get_user_by_email(data['email'])
+    print(user)
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+    if user.status:
+        return jsonify({"error": "User already verified"}), 402
+
+    tokens = JWTAuth().get_access_token({
+        "user_id": user.id,
+        "email": user.email
+    })
+
+    salt = bcrypt.gensalt()
+    refresh_token_prev = tokens["refresh_token"].encode('utf-8')
+    refresh_token_hashed = bcrypt.hashpw(refresh_token_prev, salt)
+    user_agent = request.headers.get('User-Agent', 'Unknown')
+
+    RefreshTokenRepository(session).create_refresh_token(
+        token_hash=refresh_token_hashed.decode('utf-8'),
+        user_agent=user_agent,
+        user_id=user.id,
+    )
+
+    EmailSender().send_email(
+        to=user.email,
+        tokens=tokens["access_token"],
+    )
+
+    return jsonify({"message": "Email sent successfully",
+                    "user_id": user.id}), 200
 
 
