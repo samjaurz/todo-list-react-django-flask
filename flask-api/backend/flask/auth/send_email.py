@@ -4,7 +4,7 @@ from email.mime.multipart import MIMEMultipart
 
 
 class EmailSender:
-    def send_email(self, to , token):
+    def send_email(self, to , tokens):
         session = smtplib.SMTP('sandbox.smtp.mailtrap.io', 2525)
         session.ehlo()
         session.starttls()
@@ -15,20 +15,19 @@ class EmailSender:
         msg['From'] = 'email@yourdomain.com'
         msg['To'] = to  # 'samjaurz@gmail.com'
 
-        msg['Authorized'] = token
-        text = f"Click the following button to verify: {token}"
+        text = f"Click the following button to verify: {tokens}"
         html = """
                 <html>
                 <head></head>
                 <body>
-                <a href="http://localhost:3000/verification?token={token}">
+                <a href="http://localhost:3000/verification?token={tokens}">
                 <button type="button">Verified</button>
                 </a>
                 </body>
                 </html>
                """
 
-        html = html.replace("{token}", token)
+        html = html.replace("{tokens}", tokens)
         part1 = MIMEText(text, 'plain')
         part2 = MIMEText(html, 'html')
 
