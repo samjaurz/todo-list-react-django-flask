@@ -1,6 +1,8 @@
 from flask import Blueprint, jsonify, request
 from backend.db_session import with_db_session
 import bcrypt
+
+from backend.flask.auth.decorator import auth_decorator
 from backend.repositories.user_repository import UserRepository
 from backend.repositories.refresh_token_repository import RefreshTokenRepository
 from backend.flask.auth.auth_jwt import JWTAuth
@@ -86,7 +88,7 @@ def sign_up(session):
         last_name=data['last_name'],
         email=data['email'],
         password=hashed.decode('utf-8'),
-        status=True,
+        status=False,
     )
 
     tokens = JWTAuth().get_access_token({
@@ -106,7 +108,7 @@ def sign_up(session):
 
     EmailSender().send_email(
         to = created_user.email,
-        token = tokens["access_token"],
+        tokens = tokens["access_token"],
     )
 
     return jsonify({"message": "Sign up successful",
@@ -172,8 +174,62 @@ def validate_refresh_token(session):
 
 
 @auth_api.route('/verification', methods=['GET'])
-def verification():
-    pass
+@with_db_session
+def verification(session):
+
+    token = request.headers.get('Authorization').split()[1]
+    if not token:
+        return jsonify({"error": "Token missing"}), 401
+    decode = JWTAuth().decode_credentials(token)
+    if not decode:
+        return jsonify({"error": "This token is invalid"})
+
+    user = UserRepository(session).get_user_by_id(decode["user_id"])
+    if not user:
+        return jsonify({"error": "User not found"}),404
+
+    UserRepository(session).update_user(
+        user_id= decode["user_id"],
+        **{
+            "status": True
+        }
+    )
+
+    tokens = JWTAuth().get_access_token({
+        "user_id": user.id,
+        "email": user.email
+    })
+
+    retrieve_refresh_db = RefreshTokenRepository(session).get_refresh_token_by_user_id(user.id)
+
+    salt = bcrypt.gensalt()
+    refresh_token_prev = tokens["refresh_token"].encode('utf-8')
+    refresh_token_hashed = bcrypt.hashpw(refresh_token_prev, salt)
+    user_agent = request.headers.get('User-Agent', 'Unknown')
+
+    RefreshTokenRepository(session).update_refresh_token(
+        refresh_token_id=retrieve_refresh_db.id,
+        **{
+            "token_hash": refresh_token_hashed.decode('utf-8'),
+            "user_agent": user_agent,
+        }
+    )
+
+    response = jsonify({"message": "Verification successful",
+                        "access_token": tokens["access_token"]})
+    response.status_code = 200
+    response.set_cookie(
+        'refresh_token',
+        value=tokens["refresh_token"],
+        samesite='None',
+        httponly=True,
+        secure=True,
+        max_age=604800,
+    )
+
+    return response
+
+
 
 
 
