@@ -23,12 +23,9 @@ export default function SignupPage() {
         };
         const response = await api.post("auth/sign_up", payload);
         if (response.status === 201) {
-            const access_token: string = response.data["access_token"];
-            sessionStorage.setItem('access_token', access_token);
             sessionStorage.setItem('user_id', response.data["user_id"])
-            //api.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
             console.log("response from signup", response.data);
-            router.push("/tasks");
+            router.push("/verification");
         }
     };
 
