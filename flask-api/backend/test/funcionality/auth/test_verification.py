@@ -9,7 +9,6 @@ def test_verification_user(client, gen_token, db_session):
     THEN return a status code 201 and a json object with the tasks data
     """
 
-    user_id = gen_token["user"]["id"]
     client.set_cookie(
         'refresh_token',
         value=gen_token["tokens"]["refresh_token"],

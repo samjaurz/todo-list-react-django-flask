@@ -67,6 +67,7 @@ def gen_token(db_session, admin_user_factory):
 
     return {
         "user": user,
+        "email": user["email"],
         "tokens": token
     }
 
