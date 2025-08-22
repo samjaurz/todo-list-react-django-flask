@@ -20,7 +20,7 @@ export default function Home() {
     const [tasks, setTasks] = useState<Task[]>([]);
     const [editingId, setEditingId] = useState<number | null>(null);
     const [apiSelection, setApiSelection] = useState(false)
-    const [userId, setUserId] = useState<number>(0);
+    const [userId, setUserId] = useState<number>(-1);
 
 
     const api = getApiInstance(apiSelection);

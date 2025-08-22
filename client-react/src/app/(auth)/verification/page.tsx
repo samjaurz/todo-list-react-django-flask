@@ -6,6 +6,7 @@ import {useSearchParams, useRouter} from 'next/navigation'
 const Verification = () => {
     const searchParams = useSearchParams()
     const verification_token: string | null = searchParams.get('token')
+    const user_email: string | null = searchParams.get("email");
     const api = getApiInstance(false);
     const router = useRouter()
 
@@ -28,6 +29,21 @@ const Verification = () => {
         }
     }
 
+    const handleResendEmail = async () => {
+        try {
+            const payload = {
+                email: user_email
+            }
+            const response = await api.post('auth/resend_email_verification', payload);
+            if (response.status == 200) {
+                console.log(response.data);
+            }
+        } catch (error) {
+            console.error("Error Axios", error);
+            console.log("error from not getting task")
+        }
+    }
+
 
     return (
         <div className="min-h-screen bg-gray-50">
@@ -39,8 +55,13 @@ const Verification = () => {
                 </p>
                 <button
                     className="bg-green-700 hover:bg-green-800 text-white font-medium py-2 px-4 rounded cursor-pointer transition-colors"
+                    onClick={handleResendEmail}>
+                    RESEND EMAIL
+                </button>
+                <button
+                    className="bg-green-700 hover:bg-green-800 text-white font-medium py-2 px-4 rounded cursor-pointer transition-colors"
                     onClick={handleVerification}>
-                    CONFIRMATE EMAIL
+                    CONFIRM EMAIL
                 </button>
             </div>
         </div>

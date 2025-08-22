@@ -33,8 +33,9 @@ export default function LoginPage() {
         } catch (error: any) {
             if (error.response.status === 403) {
                 sessionStorage.setItem('user_id', error.response.data["user_id"]);
+                const userEmail = error.response.data["email"]
                 console.log("response from verification", error.response.data);
-                router.push("/verification");
+                router.push(`/verification?email=${userEmail}`);
             }
             console.log("error", error);
             console.log("Not authorized");
