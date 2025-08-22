@@ -8,7 +8,7 @@ class RefreshToken(Base):
     id : Mapped[int] = mapped_column(primary_key=True)
     token_hash : Mapped[str] = mapped_column(String)
     user_agent: Mapped[str] = mapped_column(String)
-    user_id : Mapped[int] = mapped_column(ForeignKey("users.id"))
+    user_id : Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
 
     def __repr__(self) -> str:
         return (f"<RefreshToken(id={self.id}, "

@@ -1,5 +1,5 @@
 import datetime
-from sqlalchemy import String, DateTime, Boolean, func
+from sqlalchemy import String, DateTime, Boolean, func, Integer
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from . import Base
@@ -7,7 +7,7 @@ from . import Base
 
 class User(Base):
     __tablename__ = "users"
-    id: Mapped[int] = mapped_column(primary_key=True)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     name: Mapped[str] = mapped_column(String)
     last_name: Mapped[str] = mapped_column(String)
     email: Mapped[str] = mapped_column(String)
