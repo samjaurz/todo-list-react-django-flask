@@ -9,6 +9,42 @@ tasks_api = Blueprint('tasks_api', __name__)
 @with_db_session
 @auth_decorator
 def create_task(session):
+    """
+    Create a new task
+    ---
+    tags:
+        - Task
+    parameters:
+        - name: body
+          in: body
+          type: object
+          required: true
+          schema:
+          properties:
+            name:
+                type: string
+            status:
+                type: boolean
+            user_id:
+                type: integer
+          description: a payload of the required fields to create the task
+        - name: authorization
+          in: header
+          type: string
+          required: true
+          description: access token for authentication
+    responses:
+        200:
+         description: Task created
+         schema:
+          properties:
+            name:
+                type: string
+            status:
+                type: boolean
+            user_id:
+                type: integer
+    """
     data = request.get_json()
     created_task = TaskRepository(session).create_task(
         name=data["name"],
@@ -22,6 +58,39 @@ def create_task(session):
 @with_db_session
 @auth_decorator
 def get_task_by_id(session, task_id: int):
+    """
+        Get a task by id
+        ---
+        tags:
+            - Task
+        parameters:
+            - name: task_id
+              in: path
+              type: integer
+              required: true
+              description: ID of the task
+            - name: authorization
+              in: header
+              type: string
+              required: true
+              description: access token for authentication
+        responses:
+            200:
+             description: Task found
+             schema:
+                type: object
+                properties:
+                    task:
+                        type: array
+                        items:
+                            type: object
+                            properties:
+                                id: integer
+                                status: boolean
+                                user_id: integer
+                    404:
+                     description: task not found
+    """
     read_task = TaskRepository(session).get_task_by_id(task_id)
     if read_task is None:
         return jsonify({"message": "task not found"}), 404
@@ -32,6 +101,40 @@ def get_task_by_id(session, task_id: int):
 @with_db_session
 @auth_decorator
 def update_task_by_id(session, task_id: int):
+    """
+        Update a task
+        ---
+        tags:
+            - Task
+        parameters:
+            - name: task_id
+              in: path
+              type: integer
+              required: true
+              description: ID of the task
+            - name: authorization
+              in: header
+              type: string
+              required: true
+              description: access token for authentication
+
+        responses:
+            200:
+             description: Task updated successfully
+             schema:
+                type: object
+                properties:
+                    task:
+                        type: array
+                        items:
+                            type: object
+                            properties:
+                                id: integer
+                                status: boolean
+                                user_id: integer
+                    404:
+                     description: task not found
+    """
     data = request.get_json()
     updated_task = TaskRepository(session).update_task(
         task_id=task_id,
@@ -48,6 +151,34 @@ def update_task_by_id(session, task_id: int):
 @with_db_session
 @auth_decorator
 def delete_task(session, task_id: int):
+    """
+        Delete a task
+        ---
+        tags:
+            - Task
+        parameters:
+            - name: task_id
+              in: path
+              type: integer
+              required: true
+              description: ID of the task
+            - name: authorization
+              in: header
+              type: string
+              required: true
+              description: access token for authentication
+        responses:
+            200:
+             description: Task deleted successfully
+             schema:
+                type: object
+                properties:
+                    message:
+                        type: string
+
+            404:
+                description: Task not found
+    """
     deleted = TaskRepository(session).delete_task(task_id)
     if not deleted:
         return jsonify({"message": "Task not found"}), 404
