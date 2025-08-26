@@ -5,9 +5,15 @@ from functools import wraps
 def auth_decorator(func):
     @wraps(func)
     def wrapper(session, **kwargs):
-        print("headers",request.headers)
-        token = request.headers.get('Authorization').split()[1]
-        print("token", token)
+        headers = request.headers.get('Authorization')
+        if not headers:
+            return jsonify({'message': 'No authorization header'}),401
+        parts = headers.split()
+        if len(parts) != 2:
+            return jsonify({'message': 'Invalid authorization header'}), 401
+        if parts[0] != 'Bearer':
+            return jsonify({'message': 'Invalid authorization format'}), 401
+        token = headers.split()[1]
         if not token:
             return jsonify({"error": "Token missing"}), 401
         decode = JWTAuth().decode_credentials(token)
