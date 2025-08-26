@@ -4,9 +4,11 @@ from backend.flask.routes.tasks_routes import tasks_api
 from backend.flask.routes.users_routes import users_api
 from backend.flask.auth.auth_controller import auth_api
 from backend.db_session import SessionFactory
+from flasgger import Swagger
 
 def create_app(config_object=None):
     app = Flask(__name__)
+    swagger = Swagger(app)
 
     if config_object:
         app.config.from_object(config_object)
