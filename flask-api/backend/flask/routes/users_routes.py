@@ -57,7 +57,7 @@ def get_user_by_id(session, user_id: int):
     return jsonify(read_user.to_dict()), 200
 
 
-@users_api.route('/<int:user_id>/get_tasks', methods=['GET'])
+@users_api.route('/<int:user_id>/tasks', methods=['GET'])
 @with_db_session
 @auth_decorator
 def get_all_task_by_user(session, user_id: int):
