@@ -36,7 +36,7 @@ export default function Home() {
     const getAllUser = async () => {
         try {
             const user_id: number = Number(sessionStorage.getItem('user_id'));
-            const response = await api.get(`/users/${user_id}/get_tasks`);
+            const response = await api.get(`/users/${user_id}/tasks`);
             console.log(response.status)
             if (response.status === 200) {
                 setUserId(response.data.user_id);
