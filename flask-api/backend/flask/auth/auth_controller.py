@@ -5,6 +5,7 @@ from backend.repositories.user_repository import UserRepository
 from backend.repositories.refresh_token_repository import RefreshTokenRepository
 from backend.flask.auth.auth_jwt import JWTAuth
 from backend.flask.auth.send_email import EmailSender
+
 auth_api = Blueprint('auth_api', __name__)
 
 
@@ -48,12 +49,12 @@ def login(session):
 
     user = UserRepository(session).get_user_by_email(data['email'])
     if not user:
-        return jsonify({"message":"User not found"}), 404
+        return jsonify({"message": "User not found"}), 404
     if user.status is False:
         return jsonify({"message": "User is not verified",
                         "user_id": user.id,
                         "email": user.email
-                        }),403
+                        }), 403
 
     stored_hash = user.password.encode('utf-8')
     if not bcrypt.checkpw(password_client, stored_hash):
@@ -148,10 +149,10 @@ def sign_up(session):
     """
     data = request.get_json()
     email = UserRepository(session).get_user_by_email(data['email'])
-    if data['password'] != data['password_confirmation']:
-        return jsonify({"error": "password does not match"}),401
     if email:
-        return jsonify({"error": "email already in use"}),401
+        return jsonify({"message": "Email already in use"}), 401
+    if data['password'] != data['password_confirmation']:
+        return jsonify({"message": "password does not match"}), 401
 
     password_client = data['password'].encode('utf-8')
     salt = bcrypt.gensalt()
@@ -180,12 +181,12 @@ def sign_up(session):
     )
 
     EmailSender().send_email(
-        to = created_user.email,
-        tokens = tokens["access_token"],
+        to=created_user.email,
+        tokens=tokens["access_token"],
     )
 
     return jsonify({"message": "Sign up successful",
-                        "user_id": created_user.id}), 201
+                    "user_id": created_user.id}), 201
 
 
 @auth_api.route('/logout', methods=['POST'])
@@ -264,7 +265,6 @@ def validate_refresh_token(session):
     refresh_token_hashed = bcrypt.hashpw(refresh_token_prev, salt)
     user_agent = request.headers.get('User-Agent', 'Unknown')
 
-
     RefreshTokenRepository(session).update_refresh_token(
         refresh_token_id=retrieve_refresh_db.id,
         **{
@@ -286,7 +286,6 @@ def validate_refresh_token(session):
     )
 
     return response
-
 
 
 @auth_api.route('/verification', methods=['GET'])
@@ -336,10 +335,10 @@ def verification(session):
 
     user = UserRepository(session).get_user_by_id(decode["user_id"])
     if not user:
-        return jsonify({"error": "User not found"}),404
+        return jsonify({"error": "User not found"}), 404
 
     UserRepository(session).update_user(
-        user_id= decode["user_id"],
+        user_id=decode["user_id"],
         **{
             "status": True
         }
@@ -380,8 +379,6 @@ def verification(session):
     return response
 
 
-
-
 @auth_api.route('/resend_email_verification', methods=['POST'])
 @with_db_session
 def resend_email_verification(session):
@@ -418,5 +415,3 @@ def resend_email_verification(session):
 
     return jsonify({"message": "Email sent successfully",
                     "user_id": user.id}), 200
-
-
