@@ -2,13 +2,13 @@ from backend.test.conftest import client
 from backend.repositories.refresh_token_repository import RefreshTokenRepository
 import bcrypt
 
+
 def test_login_user(client, admin_user_factory):
     """
-    GIVEN a user register in the database
+    GIVEN a user register in the database and the status is True
     WHEN the user send the login request to the endpoint of auth/login
     THEN The login is successful and a token is returned
     """
-
     admin_user_factory()
 
     payload = {
@@ -21,13 +21,19 @@ def test_login_user(client, admin_user_factory):
     assert response.status_code == 200
     data = response.get_json()
     assert data["message"] == "Login successful"
+    assert "access_token" in data
 
-def test_login_user_has_refresh_token(client, gen_token, db_session):
+
+def test_login_user_has_refresh_token(client, admin_user_factory, gen_token, db_session):
     """
-      GIVEN a user register in the database
+      GIVEN a user register in the database and the status is True and refresh token already exists in database
       WHEN the user send the login request to the endpoint of auth/login
       THEN The login is successful and a token is returned
       """
+
+    admin_user_factory(
+        status=True,
+    )
 
     payload = {
         "email": "test_account@email.com",
@@ -43,7 +49,7 @@ def test_login_user_has_refresh_token(client, gen_token, db_session):
     RefreshTokenRepository(db_session).create_refresh_token(
         token_hash=refresh_token_hashed.decode('utf-8'),
         user_agent=user_agent,
-        user_id= user_id,
+        user_id=user_id,
     )
 
     response = client.post('/auth/login', json=payload)
@@ -51,3 +57,42 @@ def test_login_user_has_refresh_token(client, gen_token, db_session):
     assert response.status_code == 200
     data = response.get_json()
     assert data["message"] == "Login successful"
+    assert "access_token" in data
+
+
+def test_login_user_dont_exist(client, db_session):
+    """
+    GIVEN a user not register in the database
+    WHEN the user send the login request to the endpoint of auth/login
+    THEN The login is failed
+    """
+
+    payload = {
+        "email": "user_dont_exist@email.com",
+        "password": "12345678",
+    }
+
+    response = client.post('/auth/login', json=payload)
+
+    assert response.status_code == 404
+    data = response.get_json()
+    assert data["message"] == "User not found"
+
+
+def test_login_incorrect_password(client, admin_user_factory):
+    """
+    GIVEN a user register in the database and the status is True
+    WHEN the user send the login request to the endpoint of auth/login
+    THEN The login is failed because the password is incorrect
+    """
+    admin_user_factory()
+
+    payload = {
+        "email": "test_account@email.com",
+        "password": "password_incorrect",
+    }
+
+    response = client.post('/auth/login', json=payload)
+    assert response.status_code == 401
+    data = response.get_json()
+    assert data["message"] == "Invalid password"

@@ -39,16 +39,16 @@ def client(app):
 
 @pytest.fixture
 def admin_user_factory(db_session):
-    def _create_user():
+    def _create_user(status : bool= True):
         password_client = "12345678"
         hashed = bcrypt.hashpw(password_client.encode(), bcrypt.gensalt()).decode()
 
         user = User(
-            name="Samuel",
-            last_name="Jauregui",
+            name="test",
+            last_name="account",
             email="test_account@email.com",
             password=hashed,
-            status=False,
+            status= status
         )
         db_session.add(user)
         db_session.commit()
