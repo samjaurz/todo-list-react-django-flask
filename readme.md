@@ -57,3 +57,7 @@ python app.py
 ```
 export PYTHONPATH=/Users/sam/Desktop/try/todo-list-react-django-flask/flask-api:$PYTHONPATH
 ```
+For Swagger documentation of the RESTAPI
+```
+http://localhost:5000/apidocs/
+```

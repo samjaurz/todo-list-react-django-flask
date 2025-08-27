@@ -90,12 +90,15 @@ def get_all_task_by_user(session, user_id: int):
                     items:
                         type: object
                         properties:
-                            id: integer
-                            status: boolean
-                            user_id: integer
+                            id:
+                                type: integer
+                            status:
+                                type: boolean
+                            user_id:
+                                type: integer
 
-            404:
-             description: User not found
+        404:
+         description: User not found
     """
     read_user = UserRepository(session).get_user_by_id(user_id)
     if read_user is None:
@@ -145,11 +148,14 @@ def search_all_task_by_user(session, user_id: int):
                     items:
                         type: object
                         properties:
-                            id: integer
-                            status: boolean
-                            user_id: integer
-                404:
-                 description: user not found or task are missing
+                            id:
+                                type: integer
+                            status:
+                                type: boolean
+                            user_id:
+                                type: integer
+        404:
+         description: user not found or task are missing
     """
     read_user = UserRepository(session).get_user_by_id(user_id)
     if read_user is None:

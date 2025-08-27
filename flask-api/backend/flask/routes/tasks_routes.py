@@ -5,6 +5,7 @@ from backend.flask.auth.decorator import auth_decorator
 
 tasks_api = Blueprint('tasks_api', __name__)
 
+
 @tasks_api.route('/', methods=['POST'])
 @with_db_session
 @auth_decorator
@@ -17,16 +18,16 @@ def create_task(session):
     parameters:
         - name: body
           in: body
-          type: object
           required: true
           schema:
-          properties:
-            name:
-                type: string
-            status:
-                type: boolean
-            user_id:
-                type: integer
+            type: object
+            properties:
+                name:
+                    type: string
+                status:
+                    type: boolean
+                user_id:
+                    type: integer
           description: a payload of the required fields to create the task
         - name: authorization
           in: header
@@ -59,25 +60,25 @@ def create_task(session):
 @auth_decorator
 def get_task_by_id(session, task_id: int):
     """
-        Get a task by id
-        ---
-        tags:
-            - Task
-        parameters:
-            - name: task_id
-              in: path
-              type: integer
-              required: true
-              description: ID of the task
-            - name: authorization
-              in: header
-              type: string
-              required: true
-              description: access token for authentication
-        responses:
-            200:
-             description: Task found
-             schema:
+    Get a task by id
+    ---
+    tags:
+        - Task
+    parameters:
+        - name: task_id
+          in: path
+          type: integer
+          required: true
+          description: ID of the task
+        - name: authorization
+          in: header
+          type: string
+          required: true
+          description: access token for authentication
+    responses:
+        200:
+         description: Task found
+         schema:
                 type: object
                 properties:
                     task:
@@ -85,11 +86,14 @@ def get_task_by_id(session, task_id: int):
                         items:
                             type: object
                             properties:
-                                id: integer
-                                status: boolean
-                                user_id: integer
-                    404:
-                     description: task not found
+                                id:
+                                    type: integer
+                                status:
+                                    type: boolean
+                                user_id:
+                                    type: integer
+        404:
+         description: task not found
     """
     read_task = TaskRepository(session).get_task_by_id(task_id)
     if read_task is None:
@@ -102,26 +106,26 @@ def get_task_by_id(session, task_id: int):
 @auth_decorator
 def update_task_by_id(session, task_id: int):
     """
-        Update a task
-        ---
-        tags:
-            - Task
-        parameters:
-            - name: task_id
-              in: path
-              type: integer
-              required: true
-              description: ID of the task
-            - name: authorization
-              in: header
-              type: string
-              required: true
-              description: access token for authentication
+    Update a task
+    ---
+    tags:
+        - Task
+    parameters:
+        - name: task_id
+          in: path
+          type: integer
+          required: true
+          description: ID of the task
+        - name: authorization
+          in: header
+          type: string
+          required: true
+          description: access token for authentication
 
-        responses:
-            200:
-             description: Task updated successfully
-             schema:
+    responses:
+        200:
+         description: Task updated successfully
+         schema:
                 type: object
                 properties:
                     task:
@@ -129,11 +133,14 @@ def update_task_by_id(session, task_id: int):
                         items:
                             type: object
                             properties:
-                                id: integer
-                                status: boolean
-                                user_id: integer
-                    404:
-                     description: task not found
+                                id:
+                                    type: integer
+                                status:
+                                    type: boolean
+                                user_id:
+                                    type: integer
+        404:
+         description: task not found
     """
     data = request.get_json()
     updated_task = TaskRepository(session).update_task(
@@ -152,11 +159,11 @@ def update_task_by_id(session, task_id: int):
 @auth_decorator
 def delete_task(session, task_id: int):
     """
-        Delete a task
-        ---
-        tags:
-            - Task
-        parameters:
+    Delete a task
+    ---
+    tags:
+        - Task
+    parameters:
             - name: task_id
               in: path
               type: integer
@@ -167,7 +174,7 @@ def delete_task(session, task_id: int):
               type: string
               required: true
               description: access token for authentication
-        responses:
+    responses:
             200:
              description: Task deleted successfully
              schema:
@@ -183,4 +190,3 @@ def delete_task(session, task_id: int):
     if not deleted:
         return jsonify({"message": "Task not found"}), 404
     return jsonify({"message": "Task deleted successfully"}), 200
-
