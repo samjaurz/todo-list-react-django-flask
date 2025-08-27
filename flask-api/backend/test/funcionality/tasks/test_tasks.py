@@ -31,31 +31,42 @@ def test_create_tasks(client, gen_token , task_factory):
     assert data["status"] == False
     assert data["user_id"] == user_id
 
-def test_read_task_by_id(client, task_factory):
-    data_retrieved = task_factory()
-    task_id = data_retrieved["task"]["id"]
+def test_read_task_by_id(client, task_factory, gen_token ):
+    """
+    GIVEN an authorized token and specific id of the task
+    WHEN the user make a GET request to the endpoint tasks/<id_task>
+    THEN return a status code 200 and a json object with the tasks data
+    """
+    task = task_factory()
+    task_id = task["task"]["id"]
+    user_id = gen_token["user"]["id"]
     client.set_cookie(
         'refresh_token',
-        value=data_retrieved["refresh_token"],
+        value=gen_token["tokens"]["refresh_token"],
         samesite='None',
         httponly=True,
         secure=True
     )
 
-    response = client.get(f'/tasks/{task_id}')
+    response = client.get(f'/tasks/{task_id}', headers={"Authorization": f"Bearer {gen_token['tokens']['access_token']}"})
     assert response.status_code == 200
     data = response.get_json()
     assert data["name"] == "test_task"
     assert data["status"] == False
-    assert data["user_id"] == data_retrieved["task"]["user_id"]
+    assert data["user_id"] == user_id
 
-def test_update_task_by_id(client, task_factory):
-    data_retrieved = task_factory()
-    task_id = data_retrieved["task"]["id"]
-    user_id = data_retrieved["task"]["user_id"]
+def test_update_task_by_id(client, gen_token, task_factory):
+    """
+    GIVEN an authorized token and payload with the updated information of the task
+    WHEN the user make a PUT request to the endpoint tasks/<id_task>
+    THEN return a status code 200 and a json object with the updated tasks data
+    """
+    task = task_factory()
+    task_id = task["task"]["id"]
+    user_id = gen_token["user"]["id"]
     client.set_cookie(
         'access_token',
-        value=data_retrieved["tokens"]["refresh_token"],
+        value=gen_token["tokens"]["refresh_token"],
         samesite='None',
         httponly=True,
         secure=True
@@ -72,21 +83,28 @@ def test_update_task_by_id(client, task_factory):
     data = response.get_json()
     assert data["name"] == "test_task_updated"
     assert data["status"] == True
-    assert data["user_id"] == data_retrieved["task"]["user_id"]
+    assert data["user_id"] == user_id
 
 
-def test_delete_task_by_id(client, task_factory):
-    data_retrieved = task_factory()
-    task_id = data_retrieved["task"]["id"]
+def test_delete_task_by_id(client, task_factory, gen_token):
+    """
+    GIVEN an authorized token and payload with the task_id
+    WHEN the user make a DELETE request to the endpoint tasks/<id_task>
+    THEN return a status code 200 and message of successful deletion
+    """
+    task = task_factory()
+    task_id = task["task"]["id"]
     client.set_cookie(
         'access_token',
-        value=data_retrieved["access_token"],
+        value=gen_token["tokens"]["refresh_token"],
         samesite='None',
         httponly=True,
         secure=True
     )
 
-    response = client.delete(f'/tasks/{task_id}')
+    response = client.delete(f'/tasks/{task_id}', headers={"Authorization": f"Bearer {gen_token['tokens']['access_token']}"})
     assert response.status_code == 200
     data = response.get_json()
     assert data["message"] == 'Task deleted successfully'
+
+
