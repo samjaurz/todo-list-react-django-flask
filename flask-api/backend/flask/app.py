@@ -5,6 +5,10 @@ from backend.flask.routes.users_routes import users_api
 from backend.flask.auth.auth_controller import auth_api
 from backend.db_session import SessionFactory
 from flasgger import Swagger
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 def create_app(config_object=None):
     app = Flask(__name__)
@@ -13,8 +17,7 @@ def create_app(config_object=None):
     if config_object:
         app.config.from_object(config_object)
     else:
-        app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://root:root@localhost:5433/todo_list"
-
+        app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("SUPABASE_DATABASE_URL")
 
     app.db_factory = SessionFactory(app.config['SQLALCHEMY_DATABASE_URI'])
 
