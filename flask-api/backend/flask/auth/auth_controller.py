@@ -365,6 +365,7 @@ def verification(session):
     )
 
     response = jsonify({"message": "Verification successful",
+                        "user_id": user.id,
                         "access_token": tokens["access_token"]})
     response.status_code = 200
     response.set_cookie(

@@ -19,6 +19,7 @@ const Verification = () => {
             const response = await api.get('/auth/verification');
             if (response.status == 200) {
                 console.log(response);
+                sessionStorage.setItem('user_id', response.data["user_id"]);
                 router.push("/tasks");
             }
         } catch (error) {

@@ -1,6 +1,7 @@
 from backend.test.conftest import client
 
-def test_create_tasks(client, gen_token , task_factory):
+
+def test_create_tasks(client, gen_token, task_factory):
     """
     GIVEN an authorized token and data for make the tasks
     WHEN the token is validated the tasks is created with the data
@@ -17,13 +18,13 @@ def test_create_tasks(client, gen_token , task_factory):
         secure=True
     )
 
-
     task = {
-        "name" : "test_task",
-        "status" : False,
-        "user_id" : user_id,
+        "name": "test_task",
+        "status": False,
+        "user_id": user_id,
     }
-    response = client.post('/tasks/',json= task,  headers={"Authorization": f"Bearer {gen_token['tokens']['access_token']}"})
+    response = client.post('/tasks/', json=task,
+                           headers={"Authorization": f"Bearer {gen_token['tokens']['access_token']}"})
 
     assert response.status_code == 201
     data = response.get_json()
@@ -31,7 +32,8 @@ def test_create_tasks(client, gen_token , task_factory):
     assert data["status"] == False
     assert data["user_id"] == user_id
 
-def test_read_task_by_id(client, task_factory, gen_token ):
+
+def test_read_task_by_id(client, task_factory, gen_token):
     """
     GIVEN an authorized token and specific id of the task
     WHEN the user make a GET request to the endpoint tasks/<id_task>
@@ -48,12 +50,14 @@ def test_read_task_by_id(client, task_factory, gen_token ):
         secure=True
     )
 
-    response = client.get(f'/tasks/{task_id}', headers={"Authorization": f"Bearer {gen_token['tokens']['access_token']}"})
+    response = client.get(f'/tasks/{task_id}',
+                          headers={"Authorization": f"Bearer {gen_token['tokens']['access_token']}"})
     assert response.status_code == 200
     data = response.get_json()
     assert data["name"] == "test_task"
     assert data["status"] == False
     assert data["user_id"] == user_id
+
 
 def test_update_task_by_id(client, gen_token, task_factory):
     """
@@ -78,7 +82,8 @@ def test_update_task_by_id(client, gen_token, task_factory):
         "user_id": user_id,
     }
 
-    response = client.put(f'/tasks/{task_id}',json= task, headers={"Authorization": f"Bearer {gen_token['tokens']['access_token']}"})
+    response = client.put(f'/tasks/{task_id}', json=task,
+                          headers={"Authorization": f"Bearer {gen_token['tokens']['access_token']}"})
     assert response.status_code == 200
     data = response.get_json()
     assert data["name"] == "test_task_updated"
@@ -102,9 +107,8 @@ def test_delete_task_by_id(client, task_factory, gen_token):
         secure=True
     )
 
-    response = client.delete(f'/tasks/{task_id}', headers={"Authorization": f"Bearer {gen_token['tokens']['access_token']}"})
+    response = client.delete(f'/tasks/{task_id}',
+                             headers={"Authorization": f"Bearer {gen_token['tokens']['access_token']}"})
     assert response.status_code == 200
     data = response.get_json()
     assert data["message"] == 'Task deleted successfully'
-
-
