@@ -31,7 +31,7 @@ jobs:
     - uses: actions/cache@v3
       name: Define a cache for the virtual environment based on the dependencies lock file
       with:
-          path: ./.venv
+          path: /home/runner/work/todo-list-react-django-flask/todo-list-react-django-flask/flask-api/.venv
           key: venv-${{ hashFiles('poetry.lock') }}
     - name: Install the project dependencies
       run: poetry install
