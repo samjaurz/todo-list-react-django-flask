@@ -27,8 +27,8 @@ jobs:
         run:
             poetry install --with dev
       - name: Run black
-        run : |
-          black . --check
+        working-directory: flask-api
+        run: poetry run black . --check
       - name : Set PYTHONPATH GLOBAL
         run : |
             cd flask-api
