@@ -23,8 +23,8 @@ jobs:
         with:
           version: latest
       - name: Install the project dependencies
-        run: |
-            cd flask-api
+        working-directory: flask-api
+        run:
             poetry install --with dev
       - name: Run black
         run : |
