@@ -49,5 +49,6 @@ jobs:
       - name: Run pylint
         run : |
               pwd
-              poetry run pylint cd flask-api
+              cd flask-api
+              poetry run pylint $(git ls-files '*.py')
             
