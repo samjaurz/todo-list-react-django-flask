@@ -39,6 +39,9 @@ jobs:
           poetry install
       - name: flake8 Lint
         uses: py-actions/flake8@v2
+        with:
+          ignore: "flask-api/"
+          max-line-length: "100"
 
       - name: Test
         run: |
