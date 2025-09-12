@@ -40,7 +40,7 @@ jobs:
       - name: flake8 Lint
         run: |
           cd flask-api
-          flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+          flake8 . 
 
       - name: Test
         run: |
