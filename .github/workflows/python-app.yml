@@ -38,6 +38,9 @@ jobs:
           cd flask-api
           poetry install
       - uses: psf/black@stable
+        with:
+          src: "./flask-api/backend/"
+
       - name : Set PYTHONPATH GLOBAL
 
         run : |
