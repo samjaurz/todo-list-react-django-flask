@@ -14,33 +14,19 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - run: |
-          echo "Folders"
-          ls -la
-          pwd
-          echo " folder in pwd"
-                  ls -d */
-          pwd
       - name: Set up Python 3.13
         uses: actions/setup-python@v3
         with:
           python-version: "3.13"
-      - run : pwd
       - name: Install poetry
-        uses: abatilo/actions-poetry@v4
-      - uses: actions/cache@v3
-        name: Define a cache for the virtual environment based on the dependencies lock file
-        with:
-          path: ./.venv
-          key: venv-${{ hashFiles('poetry.lock') }}
+        uses: snok/install-poetry@v1
       - name: Install the project dependencies
         run: |
           cd flask-api
           poetry install --with dev
-
-        with:
-          src: "./flask-api/backend/"
-          black_args: ". --check"
+      - name: Run black
+        run : |
+          black . --check
 
       - name : Set PYTHONPATH GLOBAL
 
