@@ -20,6 +20,8 @@ jobs:
           python-version: "3.13"
       - name: Install poetry
         uses: snok/install-poetry@v1
+        with:
+          version: latest
       - name: Install the project dependencies
         run: |
             cd flask-api
