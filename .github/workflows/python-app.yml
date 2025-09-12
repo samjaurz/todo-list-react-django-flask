@@ -37,15 +37,14 @@ jobs:
         run: |
           cd flask-api
           poetry install
-      - uses: psf/black@stable
+      - uses: rickstaa/action-black@v1
         with:
-          src: "./flask-api/backend/"
+          black_args: ". --check"
 
       - name : Set PYTHONPATH GLOBAL
 
         run : |
             cd flask-api
-          
             echo PYTHONPATH=$(pwd):$PYTHONPATH >> $GITHUB_ENV
       - name: flake8 Lint
         uses: py-actions/flake8@v2
