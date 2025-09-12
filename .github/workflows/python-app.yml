@@ -49,6 +49,5 @@ jobs:
       - name: Run pylint
         run : |
               pwd
-              cd flask-api
-              poetry run pylint
+              poetry run pylint cd flask-api
             
