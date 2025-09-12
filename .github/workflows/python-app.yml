@@ -41,9 +41,7 @@ jobs:
       - name : Set PYTHONPATH GLOBAL
         run : |
             cd flask-api
-            pwd
             echo PYTHONPATH=$(pwd):$PYTHONPATH >> $GITHUB_ENV
-            echo GITHUB_ENV
       - name: flake8 Lint
         uses: py-actions/flake8@v2
         with:
@@ -54,7 +52,7 @@ jobs:
         run: |
            cd flask-api
            pwd
-           export PYTHONPATH=$(pwd):$PYTHONPATH
+        
            poetry run pytest
         env:
             SUPABASE_DATABASE_URL: "sqlite:///:memory:"
