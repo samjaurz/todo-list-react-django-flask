@@ -37,6 +37,8 @@ jobs:
         run: |
           cd flask-api
           poetry install
+          pwd
+          export PYTHONPATH=$(pwd):$PYTHONPATH
       - name: flake8 Lint
         uses: py-actions/flake8@v2
         with:
