@@ -23,7 +23,7 @@ jobs:
       - name: Install the project dependencies
         run: |
           cd flask-api
-          poetry install 
+          pwd
           poetry install --with dev
       - name: Run black
         run : |
