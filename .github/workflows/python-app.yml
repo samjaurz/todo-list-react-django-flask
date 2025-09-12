@@ -46,3 +46,9 @@ jobs:
         env:
             SUPABASE_DATABASE_URL: "sqlite:///:memory:"
 
+      - name: Run pylint
+        run : |
+              pwd
+              cd flask-api
+              poetry run pylint
+            
