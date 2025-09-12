@@ -40,7 +40,7 @@ jobs:
       - name: flake8 Lint
         uses: py-actions/flake8@v2
         with:
-          path: "./flask-api/"
+          path: "./flask-api/backend/"
           max-line-length: "100"
 
       - name: Test
