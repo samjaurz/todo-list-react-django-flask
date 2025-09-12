@@ -22,15 +22,12 @@ jobs:
         uses: snok/install-poetry@v1
       - name: Install the project dependencies
         run: |
-          cd flask-api
-          pwd
-          poetry install --extras "dev"
+            cd flask-api
+            poetry install --with dev
       - name: Run black
         run : |
           black . --check
-
       - name : Set PYTHONPATH GLOBAL
-
         run : |
             cd flask-api
             echo PYTHONPATH=$(pwd):$PYTHONPATH >> $GITHUB_ENV
