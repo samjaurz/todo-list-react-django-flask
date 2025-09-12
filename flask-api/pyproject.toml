@@ -1,10 +1,10 @@
-
 [tool.poetry]
 name = "todo-list"
 version = "0.1.0"
 description = "api todo_list on flask"
 authors = ["Samuel Jauregui <samjaurz_@hotmail.com>"]
 readme = "README.md"
+package-mode = false
 
 [tool.poetry.dependencies]
 python = ">=3.13,<4.0"
