@@ -37,7 +37,12 @@ jobs:
         run: |
           cd flask-api
           poetry install
-      - name: change python path
+      - name: Run pylint
+        run: |
+          pwd
+          cd flask-api
+          poetry run pylint $(git ls-files '*.py')
+      - name: Test
         run: |
            cd flask-api
            pwd
@@ -46,9 +51,5 @@ jobs:
         env:
             SUPABASE_DATABASE_URL: "sqlite:///:memory:"
 
-      - name: Run pylint
-        run : |
-              pwd
-              cd flask-api
-              poetry run pylint $(git ls-files '*.py')
+
             
