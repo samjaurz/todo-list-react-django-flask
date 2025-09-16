@@ -1,5 +1,3 @@
-# This workflow will install Python dependencies, run tests and lint with a single version of Python
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
 
 name: Python application
 
@@ -14,40 +12,39 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - run: |
-          echo "Folders"
-          ls -la
-          pwd
-          echo " folder in pwd"
-                  ls -d */
-          pwd
       - name: Set up Python 3.13
         uses: actions/setup-python@v3
         with:
           python-version: "3.13"
-      - run : pwd
       - name: Install poetry
-        uses: abatilo/actions-poetry@v4
-      - uses: actions/cache@v3
-        name: Define a cache for the virtual environment based on the dependencies lock file
+        uses: snok/install-poetry@v1
         with:
-          path: ./.venv
-          key: venv-${{ hashFiles('poetry.lock') }}
+          version: latest
       - name: Install the project dependencies
-        run: |
-          cd flask-api
-          poetry install
-      - name: change python path
+        working-directory: flask-api
+        run:
+            poetry install --with dev
+      - name: Run black
+        working-directory: flask-api
+        run: poetry run black .
+      - name : Set PYTHONPATH GLOBAL
+        run : |
+            cd flask-api
+            echo PYTHONPATH=$(pwd):$PYTHONPATH >> $GITHUB_ENV
+      - name: flake8 Lint
+        uses: py-actions/flake8@v2
+        with:
+          path: "./flask-api/backend/test/funcionality/users/test_user.py"
+          max-line-length: "88"
+
+      - name: Test
         run: |
            cd flask-api
            pwd
-           export PYTHONPATH=$(pwd):$PYTHONPATH
+        
            poetry run pytest
         env:
             SUPABASE_DATABASE_URL: "sqlite:///:memory:"
 
-      - name: Run pylint
-        run : |
-              pwd
-              poetry run pylint cd flask-api
+
             
