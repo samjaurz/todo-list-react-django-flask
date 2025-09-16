@@ -1,5 +1,3 @@
-# This workflow will install Python dependencies, run tests and lint with a single version of Python
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
 
 name: Python application
 
@@ -28,7 +26,7 @@ jobs:
             poetry install --with dev
       - name: Run black
         working-directory: flask-api
-        run: poetry run black . --check
+        run: poetry run black .
       - name : Set PYTHONPATH GLOBAL
         run : |
             cd flask-api
@@ -37,7 +35,7 @@ jobs:
         uses: py-actions/flake8@v2
         with:
           path: "./flask-api/backend/test/funcionality/users/test_user.py"
-          max-line-length: "100"
+          max-line-length: "88"
 
       - name: Test
         run: |

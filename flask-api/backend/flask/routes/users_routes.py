@@ -3,10 +3,10 @@ from backend.db_session import with_db_session
 from backend.repositories.user_repository import UserRepository
 from backend.flask.auth.decorator import auth_decorator
 
-users_api = Blueprint('users_api', __name__)
+users_api = Blueprint("users_api", __name__)
 
 
-@users_api.route('/<int:user_id>', methods=['GET'])
+@users_api.route("/<int:user_id>", methods=["GET"])
 @with_db_session
 @auth_decorator
 def get_user_by_id(session, user_id: int):
@@ -57,7 +57,7 @@ def get_user_by_id(session, user_id: int):
     return jsonify(read_user.to_dict()), 200
 
 
-@users_api.route('/<int:user_id>/tasks', methods=['GET'])
+@users_api.route("/<int:user_id>/tasks", methods=["GET"])
 @with_db_session
 @auth_decorator
 def get_all_task_by_user(session, user_id: int):
@@ -104,13 +104,10 @@ def get_all_task_by_user(session, user_id: int):
     if read_user is None:
         return jsonify({"message": "User not found"}), 404
     tasks = UserRepository(session).get_all_tasks_by_user(user_id)
-    return jsonify({
-        "user_id": user_id,
-        "tasks": tasks or []
-    }), 200
+    return jsonify({"user_id": user_id, "tasks": tasks or []}), 200
 
 
-@users_api.route('/<int:user_id>/search/', methods=['GET'])
+@users_api.route("/<int:user_id>/search/", methods=["GET"])
 @with_db_session
 @auth_decorator
 def search_all_task_by_user(session, user_id: int):
@@ -160,14 +157,9 @@ def search_all_task_by_user(session, user_id: int):
     read_user = UserRepository(session).get_user_by_id(user_id)
     if read_user is None:
         return jsonify({"message": "User not found"}), 404
-    name = request.args.get('name')
+    name = request.args.get("name")
     tasks = UserRepository(session).get_all_tasks_by_user(user_id)
-    filtered_tasks = [task for task in tasks if name.lower() in task['name'].lower()]
+    filtered_tasks = [task for task in tasks if name.lower() in task["name"].lower()]
     if not tasks:
-        return jsonify({
-            "user_id": user_id,
-            "message": "tasks not found"}), 404
-    return jsonify({
-        "user_id": user_id,
-        "tasks": filtered_tasks
-    }), 200
+        return jsonify({"user_id": user_id, "message": "tasks not found"}), 404
+    return jsonify({"user_id": user_id, "tasks": filtered_tasks}), 200

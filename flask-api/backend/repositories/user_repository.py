@@ -9,7 +9,9 @@ class UserRepository:
     def __init__(self, session: Session):
         self.session = session
 
-    def create_user(self, name: str, last_name: str, email: str, password: str, status: bool) -> User:
+    def create_user(
+        self, name: str, last_name: str, email: str, password: str, status: bool
+    ) -> User:
         now = datetime.now(timezone.utc)
         user = User(
             name=name,
@@ -55,7 +57,9 @@ class UserRepository:
                 self.session.commit()
         return user
 
-    def search_tasks_by_user_and_name(self, user_id: int , name: str) -> list[Type[Task]] | None:
+    def search_tasks_by_user_and_name(
+        self, user_id: int, name: str
+    ) -> list[Type[Task]] | None:
         user = self.session.query(User).filter_by(id=user_id).first()
         if user is None:
             return None

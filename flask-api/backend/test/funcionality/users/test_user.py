@@ -1,5 +1,6 @@
 from backend.test.conftest import client
 
+
 def test_read_user(client, gen_token):
     """
     GIVEN an authenticated user ( user_id, token )
@@ -9,13 +10,16 @@ def test_read_user(client, gen_token):
 
     user_id = gen_token["user"]["id"]
     client.set_cookie(
-        'refresh_token',
+        "refresh_token",
         value=gen_token["tokens"]["refresh_token"],
-        samesite='None',
+        samesite="None",
         httponly=True,
-        secure=True
+        secure=True,
     )
-    response = client.get(f'/users/{user_id}', headers={"Authorization": f"Bearer {gen_token['tokens']['access_token']}"})
+    response = client.get(
+        f"/users/{user_id}",
+        headers={"Authorization": f"Bearer {gen_token['tokens']['access_token']}"},
+    )
 
     assert response.status_code == 200
     data = response.get_json()
@@ -39,13 +43,16 @@ def test_get_all_task_by_user(client, gen_token, task_factory):
     task_factory()
     task_factory()
     client.set_cookie(
-        'refresh_token',
+        "refresh_token",
         value=gen_token["tokens"]["refresh_token"],
-        samesite='None',
+        samesite="None",
         httponly=True,
-        secure=True
+        secure=True,
     )
-    response = client.get(f'/users/{user_id}/tasks', headers={"Authorization": f"Bearer {gen_token['tokens']['access_token']}"})
+    response = client.get(
+        f"/users/{user_id}/tasks",
+        headers={"Authorization": f"Bearer {gen_token['tokens']['access_token']}"},
+    )
     data = response.get_json()
     assert response.status_code == 200
     assert data["user_id"] == user_id
@@ -67,14 +74,17 @@ def test_search_all_task_by_user(client, gen_token, task_factory):
     task_factory()
 
     client.set_cookie(
-        'refresh_token',
+        "refresh_token",
         value=gen_token["tokens"]["refresh_token"],
-        samesite='None',
+        samesite="None",
         httponly=True,
-        secure=True
+        secure=True,
     )
 
-    response = client.get(f'users/{user_id}/search/?name=Tas', headers={"Authorization": f"Bearer {gen_token['tokens']['access_token']}"})
+    response = client.get(
+        f"users/{user_id}/search/?name=Tas",
+        headers={"Authorization": f"Bearer {gen_token['tokens']['access_token']}"},
+    )
     assert response.status_code == 200
     data = response.get_json()
     assert data["tasks"][0]["name"] == "test_task"
