@@ -4,13 +4,12 @@ from backend.model import Base
 from functools import wraps
 from flask import current_app
 
+
 class SessionFactory:
     def __init__(self, database_uri):
         self.engine = create_engine(database_uri)
         self.SessionLocal = sessionmaker(
-            autocommit=False,
-            autoflush=False,
-            bind=self.engine
+            autocommit=False, autoflush=False, bind=self.engine
         )
         Base.metadata.create_all(self.engine)
 
@@ -20,6 +19,7 @@ class SessionFactory:
             yield database
         finally:
             database.close()
+
 
 def with_db_session(f):
     @wraps(f)
@@ -37,4 +37,5 @@ def with_db_session(f):
                 next(db_gen)
             except StopIteration:
                 pass
+
     return wrapper

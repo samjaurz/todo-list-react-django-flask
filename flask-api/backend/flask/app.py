@@ -10,6 +10,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+
 def create_app(config_object=None):
     app = Flask(__name__)
     swagger = Swagger(app)
@@ -19,18 +20,21 @@ def create_app(config_object=None):
     else:
         app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("SUPABASE_DATABASE_URL")
 
-    app.db_factory = SessionFactory(app.config['SQLALCHEMY_DATABASE_URI'])
+    app.db_factory = SessionFactory(app.config["SQLALCHEMY_DATABASE_URI"])
 
-    CORS(app, resources={
-        r"/*": {
-            "origins": ["http://localhost:3000"],
-            "supports_credentials": True,
-        }
-    })
+    CORS(
+        app,
+        resources={
+            r"/*": {
+                "origins": ["http://localhost:3000"],
+                "supports_credentials": True,
+            }
+        },
+    )
 
-    app.register_blueprint(tasks_api, url_prefix='/tasks')
-    app.register_blueprint(users_api, url_prefix='/users')
-    app.register_blueprint(auth_api, url_prefix='/auth')
+    app.register_blueprint(tasks_api, url_prefix="/tasks")
+    app.register_blueprint(users_api, url_prefix="/users")
+    app.register_blueprint(auth_api, url_prefix="/auth")
 
     return app
 

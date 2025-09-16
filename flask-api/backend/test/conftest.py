@@ -8,15 +8,17 @@ from backend.db_session import SessionFactory
 import bcrypt
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope="session")
 def app():
     app = create_app()
-    app.config.update({
-        "TESTING": True,
-        "SQLALCHEMY_DATABASE_URI": "sqlite:///:memory:",
-    })
+    app.config.update(
+        {
+            "TESTING": True,
+            "SQLALCHEMY_DATABASE_URI": "sqlite:///:memory:",
+        }
+    )
 
-    app.db_factory = SessionFactory(app.config['SQLALCHEMY_DATABASE_URI'])
+    app.db_factory = SessionFactory(app.config["SQLALCHEMY_DATABASE_URI"])
 
     with app.app_context():
         Base.metadata.create_all(app.db_factory.engine)
@@ -39,7 +41,7 @@ def client(app):
 
 @pytest.fixture
 def admin_user_factory(db_session):
-    def _create_user(status : bool= True):
+    def _create_user(status: bool = True):
         password_client = "12345678"
         hashed = bcrypt.hashpw(password_client.encode(), bcrypt.gensalt()).decode()
 
@@ -48,7 +50,7 @@ def admin_user_factory(db_session):
             last_name="account",
             email="test_account@email.com",
             password=hashed,
-            status= status
+            status=status,
         )
         db_session.add(user)
         db_session.commit()
@@ -60,16 +62,14 @@ def admin_user_factory(db_session):
 @pytest.fixture
 def gen_token(db_session, admin_user_factory):
     user = admin_user_factory()
-    token = JWTAuth().get_access_token({
-        "user_id": user["id"],
-        "email": user["email"],
-    })
+    token = JWTAuth().get_access_token(
+        {
+            "user_id": user["id"],
+            "email": user["email"],
+        }
+    )
 
-    return {
-        "user": user,
-        "email": user["email"],
-        "tokens": token
-    }
+    return {"user": user, "email": user["email"], "tokens": token}
 
 
 @pytest.fixture
@@ -77,16 +77,13 @@ def task_factory(db_session, gen_token):
     def _create_task():
         user_id = gen_token["user"]["id"]
         task = Task(
-            name= "test_task",
+            name="test_task",
             status=False,
-            user_id = user_id,
+            user_id=user_id,
         )
         db_session.add(task)
         db_session.commit()
 
-        return {
-            "task": task.to_dict(),
-            "tokens": gen_token["tokens"]
-        }
+        return {"task": task.to_dict(), "tokens": gen_token["tokens"]}
 
     return _create_task

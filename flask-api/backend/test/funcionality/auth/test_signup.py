@@ -13,10 +13,10 @@ def test_sign_up_user(client):
         "email": "test@gmail.com",
         "password": "123456",
         "password_confirmation": "123456",
-        "status": False
+        "status": False,
     }
 
-    response = client.post('/auth/sign_up', json=payload)
+    response = client.post("/auth/sign_up", json=payload)
     assert response.status_code == 201
     data = response.get_json()
     assert data["message"] == "Sign up successful"
@@ -37,10 +37,10 @@ def test_signup_user_already_exists(client, admin_user_factory):
         "email": "test_account@email.com",
         "password": "123456",
         "password_confirmation": "123456",
-        "status": False
+        "status": False,
     }
 
-    response = client.post('/auth/sign_up', json=payload)
+    response = client.post("/auth/sign_up", json=payload)
     assert response.status_code == 401
     data = response.get_json()
     assert data["message"] == "Email already in use"
@@ -58,10 +58,10 @@ def test_signup_the_password_does_not_match(client, admin_user_factory):
         "email": "test_password_dont_match@gmail.com",
         "password": "password",
         "password_confirmation": "password_confirmation",
-        "status": False
+        "status": False,
     }
 
-    response = client.post('/auth/sign_up', json=payload)
+    response = client.post("/auth/sign_up", json=payload)
     assert response.status_code == 401
     data = response.get_json()
     assert data["message"] == "password does not match"

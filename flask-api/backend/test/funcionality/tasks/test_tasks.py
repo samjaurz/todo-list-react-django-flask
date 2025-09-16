@@ -11,11 +11,11 @@ def test_create_tasks(client, gen_token, task_factory):
     user_id = gen_token["user"]["id"]
 
     client.set_cookie(
-        'refresh_token',
+        "refresh_token",
         value=gen_token["tokens"]["refresh_token"],
-        samesite='None',
+        samesite="None",
         httponly=True,
-        secure=True
+        secure=True,
     )
 
     task = {
@@ -23,8 +23,11 @@ def test_create_tasks(client, gen_token, task_factory):
         "status": False,
         "user_id": user_id,
     }
-    response = client.post('/tasks/', json=task,
-                           headers={"Authorization": f"Bearer {gen_token['tokens']['access_token']}"})
+    response = client.post(
+        "/tasks/",
+        json=task,
+        headers={"Authorization": f"Bearer {gen_token['tokens']['access_token']}"},
+    )
 
     assert response.status_code == 201
     data = response.get_json()
@@ -43,15 +46,17 @@ def test_read_task_by_id(client, task_factory, gen_token):
     task_id = task["task"]["id"]
     user_id = gen_token["user"]["id"]
     client.set_cookie(
-        'refresh_token',
+        "refresh_token",
         value=gen_token["tokens"]["refresh_token"],
-        samesite='None',
+        samesite="None",
         httponly=True,
-        secure=True
+        secure=True,
     )
 
-    response = client.get(f'/tasks/{task_id}',
-                          headers={"Authorization": f"Bearer {gen_token['tokens']['access_token']}"})
+    response = client.get(
+        f"/tasks/{task_id}",
+        headers={"Authorization": f"Bearer {gen_token['tokens']['access_token']}"},
+    )
     assert response.status_code == 200
     data = response.get_json()
     assert data["name"] == "test_task"
@@ -69,11 +74,11 @@ def test_update_task_by_id(client, gen_token, task_factory):
     task_id = task["task"]["id"]
     user_id = gen_token["user"]["id"]
     client.set_cookie(
-        'access_token',
+        "access_token",
         value=gen_token["tokens"]["refresh_token"],
-        samesite='None',
+        samesite="None",
         httponly=True,
-        secure=True
+        secure=True,
     )
 
     task = {
@@ -82,8 +87,11 @@ def test_update_task_by_id(client, gen_token, task_factory):
         "user_id": user_id,
     }
 
-    response = client.put(f'/tasks/{task_id}', json=task,
-                          headers={"Authorization": f"Bearer {gen_token['tokens']['access_token']}"})
+    response = client.put(
+        f"/tasks/{task_id}",
+        json=task,
+        headers={"Authorization": f"Bearer {gen_token['tokens']['access_token']}"},
+    )
     assert response.status_code == 200
     data = response.get_json()
     assert data["name"] == "test_task_updated"
@@ -100,15 +108,17 @@ def test_delete_task_by_id(client, task_factory, gen_token):
     task = task_factory()
     task_id = task["task"]["id"]
     client.set_cookie(
-        'access_token',
+        "access_token",
         value=gen_token["tokens"]["refresh_token"],
-        samesite='None',
+        samesite="None",
         httponly=True,
-        secure=True
+        secure=True,
     )
 
-    response = client.delete(f'/tasks/{task_id}',
-                             headers={"Authorization": f"Bearer {gen_token['tokens']['access_token']}"})
+    response = client.delete(
+        f"/tasks/{task_id}",
+        headers={"Authorization": f"Bearer {gen_token['tokens']['access_token']}"},
+    )
     assert response.status_code == 200
     data = response.get_json()
-    assert data["message"] == 'Task deleted successfully'
+    assert data["message"] == "Task deleted successfully"

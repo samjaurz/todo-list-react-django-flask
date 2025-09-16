@@ -1,5 +1,6 @@
 from backend.test.conftest import client
 
+
 def test_verification_user(client, gen_token, db_session):
     """
     GIVEN an authorized token and data for make the tasks
@@ -11,7 +12,7 @@ def test_verification_user(client, gen_token, db_session):
     payload = {
         "email": user_email,
     }
-    response = client.post('/auth/resend_email_verification', json= payload)
+    response = client.post("/auth/resend_email_verification", json=payload)
 
     assert response.status_code == 200
     data = response.get_json()

@@ -1,14 +1,17 @@
-from sqlalchemy.orm import Mapped , mapped_column, relationship
-from sqlalchemy import  String, Boolean, ForeignKey
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy import String, Boolean, ForeignKey
 
 from . import Base
 
+
 class Task(Base):
     __tablename__ = "task"
-    id : Mapped[int] = mapped_column(primary_key=True)
-    name : Mapped[str] = mapped_column(String)
-    status : Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
-    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"),nullable=True)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(String)
+    status: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    user_id: Mapped[int] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE"), nullable=True
+    )
     user: Mapped["User"] = relationship(back_populates="task")
 
     def __repr__(self) -> str:
@@ -19,7 +22,5 @@ class Task(Base):
             "id": self.id,
             "name": self.name,
             "status": self.status,
-            "user_id": self.user_id
+            "user_id": self.user_id,
         }
-
-
